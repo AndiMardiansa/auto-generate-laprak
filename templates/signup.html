@@ -1,0 +1,55 @@
+{% extends "base_auth.html" %}
+{% block title %}Daftar — Laprakin{% endblock %}
+{% block content %}
+  <h1 class="auth-title">Buat Laprakin Account</h1>
+  <p class="auth-subtitle">Tanpa email & verifikasi — langsung masuk setelah mendaftar.</p>
+
+  {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('signup') }}">
+    <!-- Honeypot anti-bot -->
+    <div class="honeypot-field" aria-hidden="true">
+      <label for="website">Website</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="full_name">Nama Lengkap <span class="req">*</span></label>
+      <input class="form-control" id="full_name" name="full_name" type="text" value="{{ form_data.full_name }}" placeholder="Nama sesuai KTM" required />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="username">Username <span class="req">*</span></label>
+      <input class="form-control" id="username" name="username" type="text" value="{{ form_data.username }}" pattern="[a-z0-9]{3,30}" placeholder="huruf kecil & angka, tanpa spasi" required />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="signup_password">Kata Sandi <span class="req">*</span></label>
+      <div class="input-wrap">
+        <input class="form-control" id="signup_password" name="password" type="password" minlength="5" placeholder="Minimal 5 karakter" required style="padding-right: 42px;" />
+        <button type="button" class="password-toggle" onclick="togglePassword('signup_password', this)" aria-label="Tampilkan kata sandi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="confirm_password">Konfirmasi Kata Sandi <span class="req">*</span></label>
+      <div class="input-wrap">
+        <input class="form-control" id="confirm_password" name="confirm_password" type="password" minlength="5" placeholder="Ulangi kata sandi" required style="padding-right: 42px;" />
+        <button type="button" class="password-toggle" onclick="togglePassword('confirm_password', this)" aria-label="Tampilkan kata sandi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-blue btn-block">Daftar & Masuk</button>
+  </form>
+
+  <div class="auth-links">
+    <span>Sudah punya akun?</span>
+    <a href="{{ url_for('login') }}">Sign in</a>
+  </div>
+{% endblock %}

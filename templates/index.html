@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laprakin — Generator Laporan Praktikum Otomatis LabTIF UAD</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="#top" class="nav-brand">
+        <span class="brand-mark">L</span>
+        <span>Laprakin</span>
+      </a>
+      <div class="nav-links">
+        <a href="#wizard">Wizard</a>
+        <a href="#katalog">Katalog Modul</a>
+        <a href="#standar">Standar Format</a>
+        <a href="#riwayat">Riwayat</a>
+        <a href="#faq">FAQ</a>
+        <a href="#pengembang">Pengembang</a>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fillExampleData()">Isi Contoh</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="openTutorial()" title="Panduan Singkat">Tutorial</button>
+        <span class="user-pill">{{ user.full_name }}</span>
+        <a href="{{ url_for('logout') }}" class="btn btn-black btn-sm">Keluar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header id="top" class="hero">
+    <div class="hero-badge">LabTIF Universitas Ahmad Dahlan • Format Baku 2026</div>
+    <h1>Generator Laporan Praktikum Otomatis</h1>
+    <p>
+      Susun laporan praktikum terstandar LabTIF UAD dalam 5 langkah terpandu.
+      Otomatis format A4, margin 3-3-3-3 cm, Calibri 11pt, istilah teknis miring, dan siap konversi ke PDF.
+    </p>
+    <div class="hero-cta">
+      <a href="#wizard" class="btn btn-black">Mulai Susun Laporan</a>
+      <button type="button" class="btn btn-outline" onclick="fillExampleData()">Coba Isi Contoh</button>
+    </div>
+    <div class="stats-strip">
+      4 Modul Aktif • 100% Format Baku 2026 • 5 Menit Penyusunan • 0% Ribet
+    </div>
+  </header>
+
+  <!-- Wizard + Live A4 Preview -->
+  <section id="wizard" class="workspace-section">
+    <div id="workspaceGrid" class="workspace-grid">
+      <div class="wizard-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <h2 style="margin: 0; font-size: 20px;">Wizard Penyusunan Laporan</h2>
+            <div style="font-size: 12px; color: var(--text-muted);" id="autosaveStatus">Auto-Save Lokal aktif</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="resetDraft()">Reset Draft</button>
+        </div>
+
+        <!-- 5-Step Stepper -->
+        <div class="stepper" id="stepper">
+          <div class="step-item active" data-step="1" onclick="goToStep(1)">
+            <div class="step-num">1</div>
+            <div class="step-label">Modul & Profil</div>
+          </div>
+          <div class="step-item" data-step="2" onclick="goToStep(2)">
+            <div class="step-num">2</div>
+            <div class="step-label">Pre-Test</div>
+          </div>
+          <div class="step-item" data-step="3" onclick="goToStep(3)">
+            <div class="step-num">3</div>
+            <div class="step-label">Hasil</div>
+          </div>
+          <div class="step-item" data-step="4" onclick="goToStep(4)">
+            <div class="step-num">4</div>
+            <div class="step-label">Post-Test</div>
+          </div>
+          <div class="step-item" data-step="5" onclick="goToStep(5)">
+            <div class="step-num">5</div>
+            <div class="step-label">Review & Unduh</div>
+          </div>
+        </div>
+
+        <!-- STEP 1: Modul & Profil -->
+        <div class="wizard-step" id="step1">
+          <label class="form-label">Pilih Modul Praktikum <span class="req">*</span></label>
+          <div class="module-grid">
+            <label class="module-card selected" data-module="kdjk">
+              <input type="radio" name="moduleKey" value="kdjk" checked />
+              <div class="module-card-title">KDJK</div>
+              <div class="module-card-meta">14 pertemuan • Cisco Packet Tracer & Winbox</div>
+            </label>
+            <label class="module-card" data-module="sdata">
+              <input type="radio" name="moduleKey" value="sdata" />
+              <div class="module-card-title">Struktur Data</div>
+              <div class="module-card-meta">11 pertemuan • C++</div>
+            </label>
+            <label class="module-card" data-module="basdat">
+              <input type="radio" name="moduleKey" value="basdat" />
+              <div class="module-card-title">Basis Data</div>
+              <div class="module-card-meta">12 pertemuan • MySQL, ERD & MongoDB</div>
+            </label>
+            <label class="module-card" data-module="statistika">
+              <input type="radio" name="moduleKey" value="statistika" />
+              <div class="module-card-title">Statistika</div>
+              <div class="module-card-meta">14 pertemuan • SPSS, Excel & Python</div>
+            </label>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="nim">NIM <span class="req">*</span></label>
+              <input class="form-control" id="nim" type="text" placeholder="contoh: 2500018060" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="studentName">Nama Lengkap <span class="req">*</span></label>
+              <input class="form-control" id="studentName" type="text" value="{{ user.full_name }}" placeholder="Nama lengkap mahasiswa" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="meetingNumber">Pertemuan (1-16) <span class="req">*</span></label>
+              <input class="form-control" id="meetingNumber" type="number" min="1" max="16" value="1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="className">Kelas <span class="req">*</span></label>
+              <input class="form-control" id="className" type="text" placeholder="contoh: A / B / C" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="topicTitle">Judul Materi <span class="req">*</span></label>
+            <input class="form-control" id="topicTitle" type="text" placeholder="contoh: Konfigurasi Dasar Router & Ping Jaringan" />
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="dayName">Hari (Senin-Jumat) <span class="req">*</span></label>
+              <select class="form-control" id="dayName">
+                <option value="Senin">Senin</option>
+                <option value="Selasa">Selasa</option>
+                <option value="Rabu">Rabu</option>
+                <option value="Kamis">Kamis</option>
+                <option value="Jumat">Jumat</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="execDate">Tanggal Pelaksanaan <span class="req">*</span></label>
+              <input class="form-control" id="execDate" type="date" />
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="execTime">Jam Pelaksanaan <span class="req">*</span></label>
+              <input class="form-control" id="execTime" type="text" placeholder="contoh: 08.00 - 10.00 WIB" />
+            </div>
+            <div class="form-group" id="pjGroup" style="display: none;">
+              <label class="form-label" for="pjAssistant">Nama PJ Asisten Praktikum <span class="req">*</span></label>
+              <input class="form-control" id="pjAssistant" type="text" placeholder="Wajib untuk Struktur Data & Statistika" />
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Pre-Test -->
+        <div class="wizard-step" id="step2" style="display: none;">
+          <div class="toggle-row">
+            <div>
+              <div style="font-weight: 700; font-size: 14px;">Apakah ada Pre-Test?</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Jika aktif, wajib unggah minimal 1 foto bukti Pre-Test.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="hasPretest" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div id="pretestSection">
+            <div class="dropzone" id="pretestDropzone">
+              <p>Seret & lepas foto Pre-Test di sini</p>
+              <span>Atau klik untuk pilih file, atau tekan <strong>Ctrl+V</strong> untuk tempel screenshot</span>
+              <input type="file" id="pretestFileInput" accept="image/*" multiple style="display: none;" />
+            </div>
+
+            <div id="pretestImagesList"></div>
+
+            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('pretestFileInput').click()" style="margin-bottom: 18px;">
+              + Tambah Foto
+            </button>
+
+            <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;" />
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <strong style="font-size: 14px;">Blok Pertanyaan Pre-Test (Opsional)</strong>
+              <button type="button" class="btn btn-outline btn-sm" onclick="addPretestQA()">+ Tambah Soal</button>
+            </div>
+            <div id="pretestQAList"></div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Hasil Praktikum -->
+        <div class="wizard-step" id="step3" style="display: none;">
+          <div class="dropzone" id="resultDropzone">
+            <p>Unggah Foto Hasil Praktikum (Gambar 2.1, 2.2, ...)</p>
+            <span>Drag & drop, pilih file, atau paste Ctrl+V langsung</span>
+            <input type="file" id="resultFileInput" accept="image/*" multiple style="display: none;" />
+          </div>
+
+          <div id="resultImagesList"></div>
+
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('resultFileInput').click()" style="margin-bottom: 18px;">
+            + Tambah Foto Praktikum
+          </button>
+
+          <div class="form-group">
+            <label class="form-label">Kode Program (Opsional — Courier New 10pt, Spasi 1, Frame)</label>
+            <div id="codeBlocksList"></div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="addCodeBlock()">+ Tambah Kode Program</button>
+          </div>
+
+          <div class="info-card" style="margin-bottom: 16px; padding: 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px;">
+            <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">Asisten AI (Gemini API)</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 10px;">
+              Otomatis buat <strong>Alat &amp; Bahan</strong>, <strong>Langkah Kerja</strong>, <strong>Keterangan Gambar</strong> (dari screenshot), <strong>Analisis Hasil</strong>, dan <strong>Ulasan Praktikum</strong>.
+            </p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <input class="form-control" type="password" id="geminiApiKey" placeholder="Gemini API Key (opsional jika sudah diset di server)" style="flex: 1; min-width: 220px;" />
+              <button type="button" class="btn btn-black btn-sm" id="aiGenerateBtn" onclick="generateWithGeminiAI()">
+                Generate dengan AI (Gemini)
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="toolsMaterialsText">A. Alat dan Bahan (1 item per baris)</label>
+            <textarea class="form-control" id="toolsMaterialsText" rows="3" placeholder="Laptop / PC&#10;Dev C++"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="workStepsText">B. Langkah Kerja (1 langkah per baris)</label>
+            <textarea class="form-control" id="workStepsText" rows="4" placeholder="Membuat program C++...&#10;Menjalankan program dan mengamati output..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="analysisText">D. Analisis Hasil Praktikum</label>
+            <textarea class="form-control" id="analysisText" rows="5" placeholder="Tuliskan analisis hasil program/percobaan atau generate otomatis dengan AI..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reviewText">Ulasan / Refleksi Praktikum (Wajib Format Baku) <span class="req">*</span></label>
+            <textarea class="form-control" id="reviewText" rows="6" placeholder="Tuliskan analisis hasil percobaan, penjelasan perintah/sintaks, kendala & solusi, serta temuan spesifik praktikum..."></textarea>
+            <div class="form-hint" style="margin-top:6px; font-size:0.82rem; color:var(--text-muted,#6b7280);">
+              Tip Rubrik Skor 5: Muat pembelajaran, kendala, solusi, hasil, dan temuan spesifik — hindari ulasan generik.
+            </div>
+            <div class="meter-box">
+              <div class="meter-header">
+                <span id="wordCountLabel">0 kata</span>
+                <span id="completenessLabel">Kelengkapan: 0%</span>
+              </div>
+              <div class="meter-bar">
+                <div class="meter-fill" id="completenessFill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Post-Test -->
+        <div class="wizard-step" id="step4" style="display: none;">
+          <div class="toggle-row">
+            <div>
+              <div style="font-weight: 700; font-size: 14px;">Apakah ada Post-Test?</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Dokumentasi hasil Post-Test akan diberi label Gambar 3.1, 3.2, dst.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="hasPosttest" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div id="posttestSection">
+            <div class="dropzone" id="posttestDropzone">
+              <p>Unggah Foto Post-Test (Gambar 3.1, ...)</p>
+              <span>Drag & drop, pilih file, atau paste Ctrl+V</span>
+              <input type="file" id="posttestFileInput" accept="image/*" multiple style="display: none;" />
+            </div>
+            <div id="posttestImagesList"></div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('posttestFileInput').click()" style="margin-bottom: 18px;">
+              + Tambah Foto Post-Test
+            </button>
+
+            <div class="form-group">
+              <label class="form-label">Kode Program Post-Test (Opsional — Courier New 10pt, Spasi 1, Frame)</label>
+              <div id="posttestCodeBlocksList"></div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="addPosttestCodeBlock()">+ Tambah Kode Program Post-Test</button>
+            </div>
+
+            <div class="info-card" style="margin-bottom: 16px; padding: 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px;">
+              <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">Asisten AI Post-Test (Gemini API)</div>
+              <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 10px;">
+                Otomatis buat <strong>Keterangan Gambar Post-Test</strong> (tanpa mengubah judul), <strong>Keterangan Kode Program</strong>, dan <strong>Analisis Hasil Post-Test</strong>.
+              </p>
+              <button type="button" class="btn btn-black btn-sm" id="aiPosttestBtn" onclick="generatePosttestWithGeminiAI()">
+                Generate Post-Test dengan AI (Gemini)
+              </button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Blok Pertanyaan Post-Test (Opsional)</label>
+              <div id="posttestQAList"></div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="addPosttestQA()">+ Tambah Soal Post-Test</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="posttestAnalysisText">Analisis Hasil Post-Test (Opsional)</label>
+              <textarea class="form-control" id="posttestAnalysisText" rows="4" placeholder="Tuliskan analisis hasil Post-Test atau generate otomatis dengan AI..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: Review & Unduh -->
+        <div class="wizard-step" id="step5" style="display: none;">
+          <h3 style="margin: 0 0 12px; font-size: 16px;">Ringkasan Kelengkapan</h3>
+          <ul class="checklist" id="reviewChecklist"></ul>
+
+          <div class="filename-preview-box">
+            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Pratinjau Nama File Resmi</div>
+            <code id="officialFilenamePreview">-</code>
+          </div>
+
+          <div class="chips-row">
+            <span class="chip">Margin 3-3-3-3 cm</span>
+            <span class="chip">Calibri 11pt</span>
+            <span class="chip">4 Modul Aktif</span>
+            <span class="chip">Auto-Save Lokal</span>
+          </div>
+
+          <button type="button" class="btn btn-black btn-block" id="generateBtn" onclick="generateDocx()">
+            Generate Laporan Resmi (.DOCX)
+          </button>
+
+          <div id="successCard" class="success-card" style="display: none;">
+            <h3>Laporan Berhasil Dibuat!</h3>
+            <p style="margin: 0 0 12px; font-size: 14px;">
+              File <strong id="generatedFilenameText"></strong> siap diunduh.
+            </p>
+            <a id="downloadDocxLink" href="#" class="btn btn-green" style="margin-bottom: 12px;">Unduh File .DOCX</a>
+            <div style="font-size: 13px; color: #166534; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
+              <strong>Panduan Pengumpulan:</strong>
+              <ol style="margin: 6px 0 0; padding-left: 18px;">
+                <li>Buka file <code>.docx</code> di Microsoft Word / LibreOffice untuk pengecekan akhir.</li>
+                <li>Simpan / Export ke format <strong>PDF</strong> (<em>Save As → PDF</em>).</li>
+                <li>Kumpulkan file PDF melalui portal praktikum resmi LabTIF UAD sebelum tenggat.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation -->
+        <div class="wizard-nav">
+          <button type="button" class="btn btn-outline" id="prevBtn" onclick="prevStep()" style="visibility: hidden;">← Sebelumnya</button>
+          <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;" id="stepCounter">Langkah 1 dari 5</span>
+          <button type="button" class="btn btn-black" id="nextBtn" onclick="nextStep()">Lanjut →</button>
+        </div>
+      </div>
+
+      <!-- Live A4 Preview -->
+      <aside class="preview-panel" id="previewPanel">
+        <div class="preview-header">
+          <strong style="font-size: 14px;">Pratinjau A4 Langsung</strong>
+          <span class="chip" style="padding: 3px 9px; font-size: 11px;">Calibri 11pt • 1.5</span>
+        </div>
+        <div class="a4-sheet" id="a4PreviewSheet"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Katalog Modul -->
+  <section id="katalog" class="content-section">
+    <h2 class="section-title">Katalog Modul Praktikum</h2>
+    <p class="section-sub">Aturan penamaan file dan standar struktur disesuaikan otomatis per modul.</p>
+    <div class="cards-grid-4">
+      <div class="info-card">
+        <h3>KDJK</h3>
+        <p>14 Pertemuan • Cisco Packet Tracer & Winbox. Format file: <code>NIM_Nama_Pertemuan_KDJK.docx</code></p>
+      </div>
+      <div class="info-card">
+        <h3>Struktur Data</h3>
+        <p>11 Pertemuan • C++. Wajib PJ Asisten. Format: <code>NIM_Nama_Pertemuan_SData_PJ.docx</code></p>
+      </div>
+      <div class="info-card">
+        <h3>Basis Data</h3>
+        <p>12 Pertemuan • MySQL, ERD & MongoDB. Format file: <code>NIM_Nama_Pertemuan_BasisData.docx</code></p>
+      </div>
+      <div class="info-card">
+        <h3>Statistika</h3>
+        <p>14 Pertemuan • SPSS, Excel & Python. Wajib PJ Asisten. Format: <code>NIM_Nama_Pertemuan_Statistika_PJ.docx</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standar Format -->
+  <section id="standar" class="content-section">
+    <h2 class="section-title">Standar Format Baku 2026</h2>
+    <p class="section-sub">Setiap dokumen .docx memenuhi ketentuan tata tulis LabTIF Universitas Ahmad Dahlan.</p>
+    <div class="cards-grid-4">
+      <div class="info-card">
+        <h3>Kertas & Margin</h3>
+        <p>A4 Portrait dengan margin 3 cm pada sisi atas, bawah, kiri, dan kanan.</p>
+      </div>
+      <div class="info-card">
+        <h3>Tipografi & Spasi</h3>
+        <p>Font Calibri 11pt (spasi 1.5, justified), Courier New 10pt berframe untuk kode program (spasi 1.0), dan istilah asing otomatis miring.</p>
+      </div>
+      <div class="info-card">
+        <h3>Struktur Baku & Rubrik</h3>
+        <p>Cover resmi UAD 2026, Pre Test, Hasil Praktikum, Ulasan/Refleksi, Post Test, serta caption Capital Each Words.</p>
+      </div>
+      <div class="info-card">
+        <h3>Kompresi Gambar</h3>
+        <p>Gambar diberi nomor otomatis (Gambar 2.1, 3.1, ...) dan dikompresi agar ukuran file ringan.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Riwayat Laporan -->
+  <section id="riwayat" class="content-section">
+    <h2 class="section-title">Riwayat Laporan Anda</h2>
+    <p class="section-sub">Laporan yang pernah Anda generate tersimpan dan dapat diunduh ulang kapan saja.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Modul</th>
+            <th>Pertemuan</th>
+            <th>Judul Materi</th>
+            <th>Nama File</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Memuat riwayat...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="content-section">
+    <h2 class="section-title">Pertanyaan Umum (FAQ)</h2>
+    <p class="section-sub">Jawaban cepat seputar penggunaan Laprakin.</p>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>Apakah file .docx bisa langsung dikumpulkan ke portal?</summary>
+        <p>Sebaiknya periksa terlebih dahulu hasil .docx di Word, lalu simpan sebagai PDF sesuai ketentuan portal praktikum asisten masing-masing.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Bagaimana jika halaman tertutup sebelum selesai?</summary>
+        <p>Laprakin menyimpan draft secara otomatis di local storage perangkat Anda, sehingga isian Anda akan dipulihkan saat halaman dibuka kembali.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Kenapa modul Struktur Data dan Statistika meminta Nama PJ Asisten?</summary>
+        <p>Sesuai aturan penamaan file kedua modul tersebut, nama PJ Asisten disematkan langsung di akhir nama file resmi.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Pengembang -->
+  <section id="pengembang" class="content-section">
+    <div class="info-card" style="text-align: center; padding: 32px;">
+      <h2 style="margin: 0 0 8px;">Tim Pengembang Laprakin</h2>
+      <p style="max-width: 600px; margin: 0 auto 14px;">
+        Dikembangkan untuk membantu mahasiswa Informatika dalam menyusun laporan praktikum secara cepat, rapi, dan konsisten di lingkungan Laboratorium Teknik Informatika (LabTIF) Universitas Ahmad Dahlan.
+      </p>
+      <div class="chips-row" style="justify-content: center; margin-bottom: 0;">
+        <span class="chip">LabTIF UAD</span>
+        <span class="chip">Python + Flask</span>
+        <span class="chip">python-docx</span>
+        <span class="chip">SQLite</span>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 8px;">
+      <a href="{{ url_for('privacy') }}">Kebijakan privasi</a>
+      <a href="{{ url_for('terms') }}">Ketentuan penggunaan</a>
+      <a href="{{ url_for('about_account') }}">Tentang Laprakin Account</a>
+      <a href="{{ url_for('admin_page') }}">Admin</a>
+    </div>
+    <div>©2026 LabTIF Universitas Ahmad Dahlan</div>
+  </footer>
+
+  <!-- Progress Modal -->
+  <div class="modal-backdrop" id="progressModal">
+    <div class="modal-box">
+      <div class="spinner"></div>
+      <h3 style="margin: 0 0 6px;">Menyusun Dokumen .DOCX</h3>
+      <p style="margin: 0; font-size: 14px; color: var(--text-muted);">
+        Sedang mengompresi gambar, memformat Calibri 11pt, dan menandai istilah teknis...
+      </p>
+    </div>
+  </div>
+
+  <!-- 5-Step Tutorial Overlay -->
+  <div class="modal-backdrop" id="tutorialModal">
+    <div class="modal-box" style="text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span class="block-badge" id="tutBadge">Langkah 1 / 5</span>
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeTutorial()">Lewati</button>
+      </div>
+      <h3 id="tutTitle" style="margin: 0 0 8px;">Pilih Modul & Profil</h3>
+      <p id="tutDesc" style="margin: 0 0 18px; font-size: 14px; color: var(--text-muted);"></p>
+      <div style="display: flex; justify-content: space-between;">
+        <button type="button" class="btn btn-outline btn-sm" id="tutPrevBtn" onclick="prevTutorial()">Sebelumnya</button>
+        <button type="button" class="btn btn-black btn-sm" id="tutNextBtn" onclick="nextTutorial()">Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating WhatsApp Help Button -->
+  <a class="wa-float" href="https://wa.me/6281200000000?text=Halo%20Admin%20LabTIF%2C%20saya%20butuh%20bantuan%20terkait%20Laprakin." target="_blank" rel="noopener">
+    <span>Bantuan WhatsApp</span>
+  </a>
+
+  <script src="{{ url_for('static', filename='js/wizard.js') }}"></script>
+</body>
+</html>

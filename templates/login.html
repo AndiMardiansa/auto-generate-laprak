@@ -1,0 +1,40 @@
+{% extends "base_auth.html" %}
+{% block title %}Sign in — Laprakin{% endblock %}
+{% block content %}
+  <h1 class="auth-title">Sign in</h1>
+  <p class="auth-subtitle">Masuk ke Laprakin Account untuk menyusun laporan praktikum.</p>
+
+  {% if success %}
+    <div class="alert alert-success">Kata sandi berhasil diperbarui. Silakan masuk dengan kata sandi baru Anda.</div>
+  {% endif %}
+  {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST" action="{{ url_for('login') }}">
+    <div class="form-group">
+      <label class="form-label" for="identifier">Email atau Username</label>
+      <input class="form-control" id="identifier" name="identifier" type="text" placeholder="contoh: mahasiswa26" required autofocus />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <div class="input-wrap">
+        <input class="form-control" id="password" name="password" type="password" placeholder="Masukkan kata sandi" required style="padding-right: 42px;" />
+        <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Tampilkan kata sandi">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-blue btn-block">Sign in</button>
+  </form>
+
+  <div class="auth-links">
+    <a href="{{ url_for('forgot_password') }}">Lupa password?</a>
+    <a href="{{ url_for('signup') }}">Daftar sekarang</a>
+  </div>
+{% endblock %}
