@@ -3,15 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Panel — Laprakin</title>
+  <title>Admin Panel — LabCraft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="{{ url_for('index') }}" class="nav-brand">
-        <span class="brand-mark">L</span>
-        <span>Laprakin Admin</span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        </span>
+        <span>LabCraft Admin</span>
       </a>
       <div class="nav-actions">
         <a href="{{ url_for('index') }}" class="btn btn-outline btn-sm">Ke Aplikasi</a>
@@ -34,7 +39,7 @@
 
     <div id="adminDashboard" style="display: {{ 'block' if unlocked else 'none' }};">
       <h1 style="margin: 0 0 6px;">Statistik Pengguna & Laporan</h1>
-      <p style="color: var(--text-muted); margin: 0 0 24px;">Ringkasan aktivitas generator laporan Laprakin LabTIF UAD.</p>
+      <p style="color: var(--text-muted); margin: 0 0 24px;">Ringkasan aktivitas generator laporan LabCraft LabTIF UAD.</p>
 
       <div class="cards-grid-4" style="margin-bottom: 28px;">
         <div class="info-card">

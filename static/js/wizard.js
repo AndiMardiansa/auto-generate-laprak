@@ -168,24 +168,25 @@ function resetDraft() {
 }
 
 function sanitizePart(val) {
-  const cleaned = (val || "").trim().replace(/\s+/g, "_").replace(/[^A-Za-z0-9_\-]/g, "");
-  return cleaned || "TanpaNama";
+  return String(val || "")
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, "")
+    .replace(/\s+/g, " ") || "TanpaNama";
 }
 
 function getOfficialFilename() {
-  const nim = sanitizePart(state.nim || "NIM");
+  const nim = sanitizePart(state.nim || "2500018000");
+  const nim3 = nim.length >= 3 ? nim.slice(-3) : nim;
   const name = sanitizePart(state.studentName || "Nama");
-  const meet = String(state.meetingNumber || 1);
+  const meet = String(state.meetingNumber || 1).trim() || "1";
+  const slotRaw = `${(state.dayName || "").trim()} ${(state.execTime || "").trim()}`.trim();
+  const slot = slotRaw ? sanitizePart(slotRaw) : "Slot";
+  const pj = (state.pjAssistant || "").trim() ? sanitizePart(state.pjAssistant) : "PJ";
+
+  if (state.moduleKey === "sdata") return `Pert${meet}_${nim3}_${name}_SData_${slot}_${pj}.docx`;
   if (state.moduleKey === "kdjk") return `${nim}_${name}_${meet}_KDJK.docx`;
-  if (state.moduleKey === "sdata") {
-    const pj = state.pjAssistant.trim() ? sanitizePart(state.pjAssistant) : "SLOT_PJ";
-    return `${nim}_${name}_${meet}_SData_${pj}.docx`;
-  }
-  if (state.moduleKey === "basdat") return `${nim}_${name}_${meet}_BasisData.docx`;
-  if (state.moduleKey === "statistika") {
-    const pj = state.pjAssistant.trim() ? sanitizePart(state.pjAssistant) : "SLOT_PJ";
-    return `${nim}_${name}_${meet}_Statistika_${pj}.docx`;
-  }
+  if (state.moduleKey === "basdat") return `Pertemuan ${meet}_${nim}_${name}.docx`;
+  if (state.moduleKey === "statistika") return `${nim}_${name}_${slot}_${pj}_STATISTIKA(${meet}).docx`;
   return `${nim}_${name}_${meet}_Laporan.docx`;
 }
 
@@ -909,6 +910,10 @@ async function generateDocx() {
   }
 }
 
+let historyItems = [];
+let historyCurrentPage = 1;
+const HISTORY_PAGE_SIZE = 5;
+
 async function loadHistory() {
   const tbody = document.getElementById("historyTableBody");
   if (!tbody) return;
@@ -916,26 +921,79 @@ async function loadHistory() {
     const res = await fetch("/api/reports");
     if (!res.ok) return;
     const data = await res.json();
-    if (!data.reports.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Belum ada riwayat laporan.</td></tr>';
-      return;
-    }
-    tbody.innerHTML = data.reports
-      .map(
-        (r) => `
+    historyItems = data.reports || [];
+    historyCurrentPage = 1;
+    renderHistoryPage(1);
+  } catch (e) {
+    // ignore
+  }
+}
+
+function renderHistoryPage(page) {
+  const tbody = document.getElementById("historyTableBody");
+  const pagEl = document.getElementById("historyPagination");
+  if (!tbody) return;
+
+  if (!historyItems.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Belum ada riwayat laporan.</td></tr>';
+    if (pagEl) pagEl.innerHTML = "";
+    return;
+  }
+
+  const totalItems = historyItems.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / HISTORY_PAGE_SIZE));
+  historyCurrentPage = Math.min(Math.max(1, page), totalPages);
+
+  const startIdx = (historyCurrentPage - 1) * HISTORY_PAGE_SIZE;
+  const endIdx = Math.min(startIdx + HISTORY_PAGE_SIZE, totalItems);
+  const pageSlice = historyItems.slice(startIdx, endIdx);
+
+  tbody.innerHTML = pageSlice
+    .map(
+      (r) => `
       <tr>
         <td>${r.created_at}</td>
-        <td>${escapeHtml(r.module_name)}</td>
+        <td><span class="history-mod-badge">${escapeHtml(r.module_name)}</span></td>
         <td>Pertemuan ${r.meeting_number}</td>
         <td>${escapeHtml(r.topic_title)}</td>
         <td><code>${escapeHtml(r.filename)}</code></td>
         <td><a class="btn btn-outline btn-sm" href="${r.downloadUrl}">Unduh Ulang</a></td>
       </tr>`
-      )
-      .join("");
-  } catch (e) {
-    // ignore
+    )
+    .join("");
+
+  if (!pagEl) return;
+
+  if (totalPages <= 1) {
+    pagEl.innerHTML = `<div class="pagination-info">Menampilkan <strong>1–${totalItems}</strong> dari <strong>${totalItems}</strong> laporan</div>`;
+    return;
   }
+
+  const pages = [];
+  for (let p = 1; p <= totalPages; p++) {
+    if (p === 1 || p === totalPages || Math.abs(p - historyCurrentPage) <= 1) {
+      pages.push(p);
+    } else if (pages[pages.length - 1] !== "...") {
+      pages.push("...");
+    }
+  }
+
+  const pageButtons = pages
+    .map((p) =>
+      p === "..."
+        ? `<span class="page-ellipsis">…</span>`
+        : `<button type="button" class="page-btn ${p === historyCurrentPage ? "active" : ""}" onclick="renderHistoryPage(${p})">${p}</button>`
+    )
+    .join("");
+
+  pagEl.innerHTML = `
+    <div class="pagination-info">Menampilkan <strong>${startIdx + 1}–${endIdx}</strong> dari <strong>${totalItems}</strong> laporan</div>
+    <div class="pagination-controls">
+      <button type="button" class="page-btn" onclick="renderHistoryPage(${historyCurrentPage - 1})" ${historyCurrentPage === 1 ? "disabled" : ""}>← Prev</button>
+      ${pageButtons}
+      <button type="button" class="page-btn" onclick="renderHistoryPage(${historyCurrentPage + 1})" ${historyCurrentPage === totalPages ? "disabled" : ""}>Next →</button>
+    </div>
+  `;
 }
 
 function makeDemoImage(label, bgColor) {

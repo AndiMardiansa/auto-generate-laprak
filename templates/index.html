@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Laprakin — Generator Laporan Praktikum Otomatis LabTIF UAD</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <title>LabCraft — Generator Laporan Praktikum Otomatis LabTIF UAD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=12) }}" />
 </head>
 <body>
   <div id="toastContainer" class="toast-container"></div>
 
-  <!-- Sticky Navbar -->
+  <!-- Sticky Glassmorphic Navbar -->
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="#top" class="nav-brand">
-        <span class="brand-mark">L</span>
-        <span>Laprakin</span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        </span>
+        <span>LabCraft</span>
       </a>
       <div class="nav-links">
         <a href="#wizard">Wizard</a>
@@ -25,28 +30,185 @@
         <a href="#pengembang">Pengembang</a>
       </div>
       <div class="nav-actions">
-        <button type="button" class="btn btn-outline btn-sm" onclick="fillExampleData()">Isi Contoh</button>
-        <button type="button" class="btn btn-outline btn-sm" onclick="openTutorial()" title="Panduan Singkat">Tutorial</button>
-        <span class="user-pill">{{ user.full_name }}</span>
-        <a href="{{ url_for('logout') }}" class="btn btn-black btn-sm">Keluar</a>
+        <button type="button" class="btn btn-outline btn-sm" onclick="fillExampleData()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14"/><path d="m17 8-5-5-5 5"/><path d="M5 21h14"/></svg>
+          <span>Isi Contoh</span>
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="openTutorial()" title="Panduan Singkat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Tutorial</span>
+        </button>
+        <button type="button" class="user-pill user-pill-btn" onclick="openProfileModal()" title="Pengaturan Profil & Akun">
+          <span class="user-avatar" aria-hidden="true">{{ (user.full_name or user.username)[0]|upper }}</span>
+          <span id="navUserName">{{ user.full_name }}</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <a href="{{ url_for('logout') }}" class="btn btn-logout btn-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Keluar</span>
+        </a>
       </div>
     </div>
   </nav>
 
-  <!-- Hero -->
+  <!-- Split Hero + Open 3D Laptop Showcase -->
   <header id="top" class="hero">
-    <div class="hero-badge">LabTIF Universitas Ahmad Dahlan • Format Baku 2026</div>
-    <h1>Generator Laporan Praktikum Otomatis</h1>
-    <p>
-      Susun laporan praktikum terstandar LabTIF UAD dalam 5 langkah terpandu.
-      Otomatis format A4, margin 3-3-3-3 cm, Calibri 11pt, istilah teknis miring, dan siap konversi ke PDF.
-    </p>
-    <div class="hero-cta">
-      <a href="#wizard" class="btn btn-black">Mulai Susun Laporan</a>
-      <button type="button" class="btn btn-outline" onclick="fillExampleData()">Coba Isi Contoh</button>
-    </div>
-    <div class="stats-strip">
-      4 Modul Aktif • 100% Format Baku 2026 • 5 Menit Penyusunan • 0% Ribet
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-eyebrow anim-stagger-1">LabTIF Universitas Ahmad Dahlan • Format Baku 2026</div>
+        <h1 class="anim-stagger-2">Generator Laporan Praktikum <span class="text-accent-blue">Otomatis.</span></h1>
+        <p class="anim-stagger-3">
+          Ubah screenshot percobaan menjadi laporan praktikum LabTIF UAD yang rapi dalam hitungan menit.
+          Didukung AI multimodal untuk analisis otomatis, tata letak presisi, dan langsung siap ekspor ke PDF.
+        </p>
+        <div class="hero-cta anim-stagger-4">
+          <a href="#wizard" class="btn btn-blue">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Mulai Susun Laporan</span>
+          </a>
+          <button type="button" class="btn btn-outline" onclick="fillExampleData()">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Coba Isi Contoh</span>
+          </button>
+        </div>
+        <div class="hero-metrics anim-stagger-5">
+          <div class="metric-item"><strong>4</strong><span>Modul Aktif</span></div>
+          <div class="metric-divider" aria-hidden="true"></div>
+          <div class="metric-item"><strong>5 Langkah</strong><span>Wizard Terpandu</span></div>
+          <div class="metric-divider" aria-hidden="true"></div>
+          <div class="metric-item"><strong>Gemini AI</strong><span>Multimodal</span></div>
+          <div class="metric-divider" aria-hidden="true"></div>
+          <div class="metric-item"><strong>.DOCX</strong><span>Siap PDF</span></div>
+        </div>
+      </div>
+
+      <!-- Studio Monitor, Gaming Chair & Coder Facing Monitor (Back View) -->
+      <div class="hero-visual anim-stagger-3" aria-hidden="true">
+        <div class="coder-stage">
+          <svg class="coder-scene-svg" viewBox="0 0 540 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Floor Shadow -->
+            <ellipse cx="270" cy="376" rx="220" ry="12" fill="#CBD5E1" opacity="0.55" />
+
+            <!-- Desk -->
+            <rect x="65" y="258" width="410" height="11" rx="5" fill="#CBD5E1" />
+            <rect x="65" y="258" width="410" height="4" rx="2" fill="#E2E8F0" />
+            <rect x="86" y="269" width="10" height="98" rx="3" fill="#94A3B8" />
+            <rect x="444" y="269" width="10" height="98" rx="3" fill="#94A3B8" />
+
+            <!-- Monitor Stand -->
+            <path d="M254 218 L244 258 L296 258 L286 218 Z" fill="#94A3B8" />
+            <rect x="224" y="252" width="92" height="6" rx="3" fill="#64748B" />
+
+            <!-- Studio Monitor Bezel (Centered Above Coder) -->
+            <rect x="102" y="18" width="336" height="204" rx="14" fill="#0F172A" stroke="#334155" stroke-width="3" />
+            <rect x="112" y="28" width="316" height="184" rx="8" fill="#0B1120" />
+
+            <!-- Monitor Topbar -->
+            <rect x="112" y="28" width="316" height="22" rx="8" fill="#1E293B" />
+            <circle cx="126" cy="39" r="3.5" fill="#EF4444" />
+            <circle cx="138" cy="39" r="3.5" fill="#F59E0B" />
+            <circle cx="150" cy="39" r="3.5" fill="#10B981" />
+            <rect x="198" y="33" width="144" height="12" rx="6" fill="#0F172A" />
+            <text x="270" y="42" text-anchor="middle" fill="#94A3B8" font-family="JetBrains Mono, monospace" font-size="7.5" font-weight="700">labcraft.labtif.uad</text>
+
+            <!-- Live Coding Terminal via foreignObject -->
+            <foreignObject x="118" y="54" width="194" height="154">
+              <div xmlns="http://www.w3.org/1999/xhtml" class="live-code-screen">
+                <div class="live-code-header">
+                  <span class="live-dot"></span>
+                  <span>generator.py</span>
+                </div>
+                <pre id="liveCodeOutput" class="live-code-pre"></pre><span class="live-code-caret">|</span>
+              </div>
+            </foreignObject>
+
+            <!-- Right Live A4 Preview Pane -->
+            <rect x="318" y="56" width="102" height="150" rx="6" fill="#FFFFFF" />
+            <rect x="342" y="68" width="54" height="5" rx="2.5" fill="#0F172A" />
+            <rect x="350" y="77" width="38" height="3.5" rx="1.75" fill="#94A3B8" />
+            <rect x="330" y="88" width="78" height="38" rx="4" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1" />
+            <path d="M346 114 L360 100 L372 110 L382 102 L394 114 Z" fill="#60A5FA" />
+            <rect x="330" y="134" width="78" height="4" rx="2" fill="#CBD5E1" />
+            <rect x="330" y="142" width="64" height="4" rx="2" fill="#CBD5E1" />
+            <rect x="330" y="150" width="72" height="4" rx="2" fill="#CBD5E1" />
+            <rect id="liveDocxBtn" x="336" y="168" width="66" height="22" rx="6" fill="#2563EB" />
+            <text id="liveDocxText" x="369" y="182" text-anchor="middle" fill="#FFFFFF" font-family="Plus Jakarta Sans, sans-serif" font-size="8" font-weight="800">.DOCX ✓</text>
+
+            <!-- Coffee Mug + Steam on Desk Right -->
+            <g class="svg-coffee">
+              <rect x="406" y="228" width="24" height="30" rx="5" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" />
+              <path d="M430 235 C438 235 438 250 430 250" stroke="#94A3B8" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <path class="steam-1" d="M414 222 C412 216 417 212 415 206" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" fill="none" />
+              <path class="steam-2" d="M422 222 C420 216 425 212 423 206" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" fill="none" />
+            </g>
+
+            <!-- RGB Mechanical Keyboard on Desk -->
+            <rect x="218" y="251" width="104" height="7" rx="3" fill="#1E293B" />
+            <rect class="rgb-bar" x="222" y="249" width="96" height="2.5" rx="1" fill="#38BDF8" />
+
+            <!-- Person Coding (Back View Facing Monitor) -->
+            <g class="coder-person">
+              <!-- Arms Reaching Forward to Desk Keyboard -->
+              <g class="coder-arm-back">
+                <path d="M214 258 L206 244 L232 246" stroke="#1D4ED8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                <circle cx="234" cy="247" r="6" fill="#FDBA74" />
+              </g>
+              <g class="coder-arm-front">
+                <path d="M326 258 L334 244 L308 246" stroke="#1D4ED8" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                <circle cx="306" cy="247" r="6" fill="#FDBA74" />
+              </g>
+
+              <!-- Hoodie Shoulders & Back -->
+              <path d="M204 268 C206 232 232 222 270 222 C308 222 334 232 336 268 L332 326 L208 326 Z" fill="#2563EB" />
+              <!-- Hoodie Hood Fold (Back View) -->
+              <path d="M242 226 C252 244 288 244 298 226 C290 218 250 218 242 226 Z" fill="#1D4ED8" />
+            </g>
+
+            <!-- Gaming Chair (Rear View: Racing Backrest, Blue Bolsters, Base & Wheels) -->
+            <g class="gaming-chair">
+              <!-- 5-Star Base & Wheels -->
+              <rect x="263" y="334" width="14" height="22" rx="3" fill="#334155" />
+              <path d="M270 352 L212 368 L216 373 L270 360 L324 373 L328 368 Z" fill="#1E293B" />
+              <rect x="267" y="352" width="6" height="20" fill="#1E293B" />
+              <circle cx="214" cy="373" r="5.5" fill="#0F172A" stroke="#64748B" stroke-width="1.5" />
+              <circle cx="270" cy="374" r="5.5" fill="#0F172A" stroke="#64748B" stroke-width="1.5" />
+              <circle cx="326" cy="373" r="5.5" fill="#0F172A" stroke="#64748B" stroke-width="1.5" />
+
+              <!-- Armrests -->
+              <rect x="184" y="286" width="22" height="8" rx="4" fill="#1E293B" />
+              <rect x="192" y="294" width="7" height="28" fill="#334155" />
+              <rect x="334" y="286" width="22" height="8" rx="4" fill="#1E293B" />
+              <rect x="341" y="294" width="7" height="28" fill="#334155" />
+
+              <!-- Wide Racing Backrest (Rear View) -->
+              <path d="M222 214 C222 198 242 190 270 190 C298 190 318 198 318 214 L326 324 C326 334 318 340 306 340 L234 340 C222 340 214 334 214 324 Z" fill="#0F172A" stroke="#1E293B" stroke-width="2" />
+              <!-- Blue Racing Bolsters on Backrest -->
+              <path d="M224 224 L236 224 L230 326 L218 326 Z" fill="#2563EB" />
+              <path d="M304 224 L316 224 L322 326 L310 326 Z" fill="#2563EB" />
+              <!-- Center Racing Spine Accent & Headrest Strap -->
+              <rect x="256" y="200" width="28" height="12" rx="5" fill="#1E293B" stroke="#3B82F6" stroke-width="1.5" />
+              <rect x="258" y="254" width="24" height="54" rx="8" fill="#1E293B" />
+              <text x="270" y="236" text-anchor="middle" fill="#60A5FA" font-family="Plus Jakarta Sans, sans-serif" font-size="8" font-weight="800" letter-spacing="0.14em">LABCRAFT</text>
+            </g>
+
+            <!-- Back of Head & Headphones (Visible Above Chair Backrest) -->
+            <g class="coder-head">
+              <rect x="261" y="198" width="18" height="18" rx="7" fill="#FDBA74" />
+              <circle cx="270" cy="176" r="24" fill="#0F172A" />
+              <path d="M248 176 C248 156 292 156 292 176" stroke="#1E293B" stroke-width="3" fill="none" />
+              <path d="M243 176 C243 142 297 142 297 176" stroke="#334155" stroke-width="5" fill="none" stroke-linecap="round" />
+              <rect x="237" y="166" width="11" height="20" rx="5" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" />
+              <rect x="292" y="166" width="11" height="20" rx="5" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5" />
+            </g>
+
+            <!-- Floating Code Badge -->
+            <g class="floating-code-badge">
+              <rect x="36" y="64" width="56" height="30" rx="10" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.5" />
+              <text x="64" y="83" text-anchor="middle" fill="#2563EB" font-family="JetBrains Mono, monospace" font-size="11.5" font-weight="800">&lt;/&gt;</text>
+            </g>
+          </svg>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -54,34 +216,55 @@
   <section id="wizard" class="workspace-section">
     <div id="workspaceGrid" class="workspace-grid">
       <div class="wizard-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div class="wizard-top-bar">
           <div>
-            <h2 style="margin: 0; font-size: 20px;">Wizard Penyusunan Laporan</h2>
-            <div style="font-size: 12px; color: var(--text-muted);" id="autosaveStatus">Auto-Save Lokal aktif</div>
+            <h2 style="margin: 0; font-size: 20px; font-weight: 800;">Wizard Penyusunan Laporan</h2>
+            <div class="autosave-badge" id="autosaveStatus">
+              <span class="autosave-dot" aria-hidden="true"></span>
+              Auto-Save Lokal aktif
+            </div>
           </div>
-          <button type="button" class="btn btn-outline btn-sm" onclick="resetDraft()">Reset Draft</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="resetDraft()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span>Reset Draft</span>
+          </button>
         </div>
 
-        <!-- 5-Step Stepper -->
+        <!-- 5-Step Stepper with Step Icons -->
         <div class="stepper" id="stepper">
           <div class="step-item active" data-step="1" onclick="goToStep(1)">
-            <div class="step-num">1</div>
+            <div class="step-num">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span class="step-badge-num">1</span>
+            </div>
             <div class="step-label">Modul & Profil</div>
           </div>
           <div class="step-item" data-step="2" onclick="goToStep(2)">
-            <div class="step-num">2</div>
+            <div class="step-num">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="m9 14 2 2 4-4"/></svg>
+              <span class="step-badge-num">2</span>
+            </div>
             <div class="step-label">Pre-Test</div>
           </div>
           <div class="step-item" data-step="3" onclick="goToStep(3)">
-            <div class="step-num">3</div>
-            <div class="step-label">Hasil</div>
+            <div class="step-num">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <span class="step-badge-num">3</span>
+            </div>
+            <div class="step-label">Langkah Praktikum</div>
           </div>
           <div class="step-item" data-step="4" onclick="goToStep(4)">
-            <div class="step-num">4</div>
+            <div class="step-num">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+              <span class="step-badge-num">4</span>
+            </div>
             <div class="step-label">Post-Test</div>
           </div>
           <div class="step-item" data-step="5" onclick="goToStep(5)">
-            <div class="step-num">5</div>
+            <div class="step-num">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span class="step-badge-num">5</span>
+            </div>
             <div class="step-label">Review & Unduh</div>
           </div>
         </div>
@@ -92,75 +275,107 @@
           <div class="module-grid">
             <label class="module-card selected" data-module="kdjk">
               <input type="radio" name="moduleKey" value="kdjk" checked />
-              <div class="module-card-title">KDJK</div>
+              <div class="module-card-head">
+                <span class="module-icon icon-blue" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                </span>
+                <div class="module-card-title">KDJK</div>
+              </div>
               <div class="module-card-meta">14 pertemuan • Cisco Packet Tracer & Winbox</div>
             </label>
             <label class="module-card" data-module="sdata">
               <input type="radio" name="moduleKey" value="sdata" />
-              <div class="module-card-title">Struktur Data</div>
+              <div class="module-card-head">
+                <span class="module-icon icon-indigo" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                </span>
+                <div class="module-card-title">Struktur Data</div>
+              </div>
               <div class="module-card-meta">11 pertemuan • C++</div>
             </label>
             <label class="module-card" data-module="basdat">
               <input type="radio" name="moduleKey" value="basdat" />
-              <div class="module-card-title">Basis Data</div>
+              <div class="module-card-head">
+                <span class="module-icon icon-sky" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </span>
+                <div class="module-card-title">Basis Data</div>
+              </div>
               <div class="module-card-meta">12 pertemuan • MySQL, ERD & MongoDB</div>
             </label>
             <label class="module-card" data-module="statistika">
               <input type="radio" name="moduleKey" value="statistika" />
-              <div class="module-card-title">Statistika</div>
+              <div class="module-card-head">
+                <span class="module-icon icon-amber" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                </span>
+                <div class="module-card-title">Statistika</div>
+              </div>
               <div class="module-card-meta">14 pertemuan • SPSS, Excel & Python</div>
             </label>
           </div>
 
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label class="form-label" for="nim">NIM <span class="req">*</span></label>
-              <input class="form-control" id="nim" type="text" placeholder="contoh: 2500018060" />
+          <div class="form-section-box">
+            <div class="form-section-head">
+              <span class="form-sec-num">01</span>
+              <span>Identitas Mahasiswa</span>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="studentName">Nama Lengkap <span class="req">*</span></label>
-              <input class="form-control" id="studentName" type="text" value="{{ user.full_name }}" placeholder="Nama lengkap mahasiswa" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="meetingNumber">Pertemuan (1-16) <span class="req">*</span></label>
-              <input class="form-control" id="meetingNumber" type="number" min="1" max="16" value="1" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="className">Kelas <span class="req">*</span></label>
-              <input class="form-control" id="className" type="text" placeholder="contoh: A / B / C" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="topicTitle">Judul Materi <span class="req">*</span></label>
-            <input class="form-control" id="topicTitle" type="text" placeholder="contoh: Konfigurasi Dasar Router & Ping Jaringan" />
-          </div>
-
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label class="form-label" for="dayName">Hari (Senin-Jumat) <span class="req">*</span></label>
-              <select class="form-control" id="dayName">
-                <option value="Senin">Senin</option>
-                <option value="Selasa">Selasa</option>
-                <option value="Rabu">Rabu</option>
-                <option value="Kamis">Kamis</option>
-                <option value="Jumat">Jumat</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="execDate">Tanggal Pelaksanaan <span class="req">*</span></label>
-              <input class="form-control" id="execDate" type="date" />
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="nim">NIM <span class="req">*</span></label>
+                <input class="form-control" id="nim" type="text" placeholder="contoh: 2500018060" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="studentName">Nama Lengkap <span class="req">*</span></label>
+                <input class="form-control" id="studentName" type="text" value="{{ user.full_name }}" placeholder="Nama lengkap mahasiswa" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="meetingNumber">Pertemuan (1-16) <span class="req">*</span></label>
+                <input class="form-control" id="meetingNumber" type="number" min="1" max="16" value="1" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="className">Kelas <span class="req">*</span></label>
+                <input class="form-control" id="className" type="text" placeholder="contoh: A / B / C" />
+              </div>
             </div>
           </div>
 
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label class="form-label" for="execTime">Jam Pelaksanaan <span class="req">*</span></label>
-              <input class="form-control" id="execTime" type="text" placeholder="contoh: 08.00 - 10.00 WIB" />
+          <div class="form-section-box">
+            <div class="form-section-head">
+              <span class="form-sec-num">02</span>
+              <span>Materi &amp; Jadwal Praktikum</span>
             </div>
-            <div class="form-group" id="pjGroup" style="display: none;">
-              <label class="form-label" for="pjAssistant">Nama PJ Asisten Praktikum <span class="req">*</span></label>
-              <input class="form-control" id="pjAssistant" type="text" placeholder="Wajib untuk Struktur Data & Statistika" />
+            <div class="form-group">
+              <label class="form-label" for="topicTitle">Judul Materi <span class="req">*</span></label>
+              <input class="form-control" id="topicTitle" type="text" placeholder="contoh: Konfigurasi Dasar Router & Ping Jaringan" />
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="dayName">Hari (Senin-Jumat) <span class="req">*</span></label>
+                <select class="form-control" id="dayName">
+                  <option value="Senin">Senin</option>
+                  <option value="Selasa">Selasa</option>
+                  <option value="Rabu">Rabu</option>
+                  <option value="Kamis">Kamis</option>
+                  <option value="Jumat">Jumat</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="execDate">Tanggal Pelaksanaan <span class="req">*</span></label>
+                <input class="form-control" id="execDate" type="date" />
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label class="form-label" for="execTime">Jam / Slot Pelaksanaan <span class="req">*</span></label>
+                <input class="form-control" id="execTime" type="text" placeholder="contoh: 10.00-11.30" />
+              </div>
+              <div class="form-group" id="pjGroup" style="display: none;">
+                <label class="form-label" for="pjAssistant">Nama PJ Asisten Praktikum <span class="req">*</span></label>
+                <input class="form-control" id="pjAssistant" type="text" placeholder="Wajib untuk Struktur Data & Statistika" />
+              </div>
             </div>
           </div>
         </div>
@@ -180,6 +395,9 @@
 
           <div id="pretestSection">
             <div class="dropzone" id="pretestDropzone">
+              <div class="dropzone-icon" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
               <p>Seret & lepas foto Pre-Test di sini</p>
               <span>Atau klik untuk pilih file, atau tekan <strong>Ctrl+V</strong> untuk tempel screenshot</span>
               <input type="file" id="pretestFileInput" accept="image/*" multiple style="display: none;" />
@@ -203,6 +421,9 @@
         <!-- STEP 3: Hasil Praktikum -->
         <div class="wizard-step" id="step3" style="display: none;">
           <div class="dropzone" id="resultDropzone">
+            <div class="dropzone-icon" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
             <p>Unggah Foto Hasil Praktikum (Gambar 2.1, 2.2, ...)</p>
             <span>Drag & drop, pilih file, atau paste Ctrl+V langsung</span>
             <input type="file" id="resultFileInput" accept="image/*" multiple style="display: none;" />
@@ -220,15 +441,21 @@
             <button type="button" class="btn btn-outline btn-sm" onclick="addCodeBlock()">+ Tambah Kode Program</button>
           </div>
 
-          <div class="info-card" style="margin-bottom: 16px; padding: 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px;">
-            <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">Asisten AI (Gemini API)</div>
-            <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 10px;">
+          <div class="ai-assistant-card">
+            <div class="ai-assistant-head">
+              <span class="ai-sparkle-badge" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              </span>
+              <div style="font-weight: 800; font-size: 14.5px;">Asisten AI (Gemini API)</div>
+            </div>
+            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px;">
               Otomatis buat <strong>Alat &amp; Bahan</strong>, <strong>Langkah Kerja</strong>, <strong>Keterangan Gambar</strong> (dari screenshot), <strong>Analisis Hasil</strong>, dan <strong>Ulasan Praktikum</strong>.
             </p>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
               <input class="form-control" type="password" id="geminiApiKey" placeholder="Gemini API Key (opsional jika sudah diset di server)" style="flex: 1; min-width: 220px;" />
-              <button type="button" class="btn btn-black btn-sm" id="aiGenerateBtn" onclick="generateWithGeminiAI()">
-                Generate dengan AI (Gemini)
+              <button type="button" class="btn btn-blue btn-sm" id="aiGenerateBtn" onclick="generateWithGeminiAI()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span>Generate dengan AI (Gemini)</span>
               </button>
             </div>
           </div>
@@ -281,6 +508,9 @@
 
           <div id="posttestSection">
             <div class="dropzone" id="posttestDropzone">
+              <div class="dropzone-icon" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
               <p>Unggah Foto Post-Test (Gambar 3.1, ...)</p>
               <span>Drag & drop, pilih file, atau paste Ctrl+V</span>
               <input type="file" id="posttestFileInput" accept="image/*" multiple style="display: none;" />
@@ -296,13 +526,19 @@
               <button type="button" class="btn btn-outline btn-sm" onclick="addPosttestCodeBlock()">+ Tambah Kode Program Post-Test</button>
             </div>
 
-            <div class="info-card" style="margin-bottom: 16px; padding: 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px;">
-              <div style="font-weight: 700; font-size: 14px; margin-bottom: 6px;">Asisten AI Post-Test (Gemini API)</div>
-              <p style="font-size: 12px; color: var(--text-muted); margin: 0 0 10px;">
+            <div class="ai-assistant-card">
+              <div class="ai-assistant-head">
+                <span class="ai-sparkle-badge" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                </span>
+                <div style="font-weight: 800; font-size: 14.5px;">Asisten AI Post-Test (Gemini API)</div>
+              </div>
+              <p style="font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px;">
                 Otomatis buat <strong>Keterangan Gambar Post-Test</strong> (tanpa mengubah judul), <strong>Keterangan Kode Program</strong>, dan <strong>Analisis Hasil Post-Test</strong>.
               </p>
-              <button type="button" class="btn btn-black btn-sm" id="aiPosttestBtn" onclick="generatePosttestWithGeminiAI()">
-                Generate Post-Test dengan AI (Gemini)
+              <button type="button" class="btn btn-blue btn-sm" id="aiPosttestBtn" onclick="generatePosttestWithGeminiAI()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                <span>Generate Post-Test dengan AI (Gemini)</span>
               </button>
             </div>
 
@@ -321,11 +557,11 @@
 
         <!-- STEP 5: Review & Unduh -->
         <div class="wizard-step" id="step5" style="display: none;">
-          <h3 style="margin: 0 0 12px; font-size: 16px;">Ringkasan Kelengkapan</h3>
+          <h3 style="margin: 0 0 12px; font-size: 16px; font-weight: 800;">Ringkasan Kelengkapan</h3>
           <ul class="checklist" id="reviewChecklist"></ul>
 
           <div class="filename-preview-box">
-            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Pratinjau Nama File Resmi</div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-primary-hover);">Pratinjau Nama File Resmi</div>
             <code id="officialFilenamePreview">-</code>
           </div>
 
@@ -336,8 +572,9 @@
             <span class="chip">Auto-Save Lokal</span>
           </div>
 
-          <button type="button" class="btn btn-black btn-block" id="generateBtn" onclick="generateDocx()">
-            Generate Laporan Resmi (.DOCX)
+          <button type="button" class="btn btn-blue btn-block" id="generateBtn" onclick="generateDocx()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Generate Laporan Resmi (.DOCX)</span>
           </button>
 
           <div id="successCard" class="success-card" style="display: none;">
@@ -345,8 +582,11 @@
             <p style="margin: 0 0 12px; font-size: 14px;">
               File <strong id="generatedFilenameText"></strong> siap diunduh.
             </p>
-            <a id="downloadDocxLink" href="#" class="btn btn-green" style="margin-bottom: 12px;">Unduh File .DOCX</a>
-            <div style="font-size: 13px; color: #166534; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #bbf7d0;">
+            <a id="downloadDocxLink" href="#" class="btn btn-green" style="margin-bottom: 12px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Unduh File .DOCX</span>
+            </a>
+            <div style="font-size: 13px; color: #065f46; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #a7f3d0;">
               <strong>Panduan Pengumpulan:</strong>
               <ol style="margin: 6px 0 0; padding-left: 18px;">
                 <li>Buka file <code>.docx</code> di Microsoft Word / LibreOffice untuk pengecekan akhir.</li>
@@ -360,15 +600,18 @@
         <!-- Wizard Navigation -->
         <div class="wizard-nav">
           <button type="button" class="btn btn-outline" id="prevBtn" onclick="prevStep()" style="visibility: hidden;">← Sebelumnya</button>
-          <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;" id="stepCounter">Langkah 1 dari 5</span>
-          <button type="button" class="btn btn-black" id="nextBtn" onclick="nextStep()">Lanjut →</button>
+          <span style="font-size: 13px; color: var(--text-muted); font-weight: 700;" id="stepCounter">Langkah 1 dari 5</span>
+          <button type="button" class="btn btn-blue" id="nextBtn" onclick="nextStep()">Lanjut →</button>
         </div>
       </div>
 
       <!-- Live A4 Preview -->
       <aside class="preview-panel" id="previewPanel">
         <div class="preview-header">
-          <strong style="font-size: 14px;">Pratinjau A4 Langsung</strong>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="live-sync-dot" aria-hidden="true"></span>
+            <strong style="font-size: 14px;">Pratinjau A4 Langsung</strong>
+          </div>
           <span class="chip" style="padding: 3px 9px; font-size: 11px;">Calibri 11pt • 1.5</span>
         </div>
         <div class="a4-sheet" id="a4PreviewSheet"></div>
@@ -377,55 +620,83 @@
   </section>
 
   <!-- Katalog Modul -->
-  <section id="katalog" class="content-section">
+  <section id="katalog" class="content-section reveal">
     <h2 class="section-title">Katalog Modul Praktikum</h2>
     <p class="section-sub">Aturan penamaan file dan standar struktur disesuaikan otomatis per modul.</p>
     <div class="cards-grid-4">
       <div class="info-card">
+        <div class="card-icon-badge icon-blue" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+        </div>
         <h3>KDJK</h3>
-        <p>14 Pertemuan • Cisco Packet Tracer & Winbox. Format file: <code>NIM_Nama_Pertemuan_KDJK.docx</code></p>
+        <p>14 Pertemuan • Cisco Packet Tracer &amp; Winbox</p>
+        <code class="card-code-pill">NIM_Nama_Pertemuan_KDJK.docx</code>
       </div>
       <div class="info-card">
+        <div class="card-icon-badge icon-indigo" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
         <h3>Struktur Data</h3>
-        <p>11 Pertemuan • C++. Wajib PJ Asisten. Format: <code>NIM_Nama_Pertemuan_SData_PJ.docx</code></p>
+        <p>11 Pertemuan • C++ • Wajib PJ Asisten</p>
+        <code class="card-code-pill">Pert{N}_{3DigitNIM}_{Nama}_SData_{Slot}_{PJ}.docx</code>
       </div>
       <div class="info-card">
+        <div class="card-icon-badge icon-sky" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
         <h3>Basis Data</h3>
-        <p>12 Pertemuan • MySQL, ERD & MongoDB. Format file: <code>NIM_Nama_Pertemuan_BasisData.docx</code></p>
+        <p>12 Pertemuan • MySQL, ERD &amp; MongoDB</p>
+        <code class="card-code-pill">Pertemuan {N}_{NIM}_{Nama}.docx</code>
       </div>
       <div class="info-card">
+        <div class="card-icon-badge icon-amber" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
         <h3>Statistika</h3>
-        <p>14 Pertemuan • SPSS, Excel & Python. Wajib PJ Asisten. Format: <code>NIM_Nama_Pertemuan_Statistika_PJ.docx</code></p>
+        <p>14 Pertemuan • SPSS, Excel &amp; Python • Wajib PJ</p>
+        <code class="card-code-pill">{NIM}_{Nama}_{Slot}_{PJ}_STATISTIKA({N}).docx</code>
       </div>
     </div>
   </section>
 
-  <!-- Standar Format -->
-  <section id="standar" class="content-section">
+  <!-- Standar Format (2x2 Architectural Spec Grid) -->
+  <section id="standar" class="content-section reveal">
     <h2 class="section-title">Standar Format Baku 2026</h2>
     <p class="section-sub">Setiap dokumen .docx memenuhi ketentuan tata tulis LabTIF Universitas Ahmad Dahlan.</p>
-    <div class="cards-grid-4">
-      <div class="info-card">
-        <h3>Kertas & Margin</h3>
-        <p>A4 Portrait dengan margin 3 cm pada sisi atas, bawah, kiri, dan kanan.</p>
+    <div class="specs-grid-2">
+      <div class="spec-card">
+        <span class="spec-index">01</span>
+        <div>
+          <h3>Kertas &amp; Margin</h3>
+          <p>A4 Portrait dengan margin 3 cm pada sisi atas, bawah, kiri, dan kanan secara presisi.</p>
+        </div>
       </div>
-      <div class="info-card">
-        <h3>Tipografi & Spasi</h3>
-        <p>Font Calibri 11pt (spasi 1.5, justified), Courier New 10pt berframe untuk kode program (spasi 1.0), dan istilah asing otomatis miring.</p>
+      <div class="spec-card">
+        <span class="spec-index">02</span>
+        <div>
+          <h3>Tipografi &amp; Spasi</h3>
+          <p>Calibri 11pt (spasi 1.5, justified), Courier New 10pt berframe untuk kode, dan istilah asing otomatis miring.</p>
+        </div>
       </div>
-      <div class="info-card">
-        <h3>Struktur Baku & Rubrik</h3>
-        <p>Cover resmi UAD 2026, Pre Test, Hasil Praktikum, Ulasan/Refleksi, Post Test, serta caption Capital Each Words.</p>
+      <div class="spec-card">
+        <span class="spec-index">03</span>
+        <div>
+          <h3>Struktur Baku &amp; Rubrik</h3>
+          <p>Cover resmi UAD 2026, Pre Test, Hasil Praktikum, Ulasan/Refleksi, Post Test, serta caption Capital Each Words.</p>
+        </div>
       </div>
-      <div class="info-card">
-        <h3>Kompresi Gambar</h3>
-        <p>Gambar diberi nomor otomatis (Gambar 2.1, 3.1, ...) dan dikompresi agar ukuran file ringan.</p>
+      <div class="spec-card">
+        <span class="spec-index">04</span>
+        <div>
+          <h3>Kompresi &amp; Penomoran Gambar</h3>
+          <p>Gambar diberi nomor otomatis (Gambar 2.1, 3.1, ...) dengan prefix <code>Ket :</code> dan dikompresi agar ukuran file ringan.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Riwayat Laporan -->
-  <section id="riwayat" class="content-section">
+  <!-- Riwayat Laporan with Pagination -->
+  <section id="riwayat" class="content-section reveal">
     <h2 class="section-title">Riwayat Laporan Anda</h2>
     <p class="section-sub">Laporan yang pernah Anda generate tersimpan dan dapat diunduh ulang kapan saja.</p>
     <div class="table-wrap">
@@ -445,12 +716,13 @@
         </tbody>
       </table>
     </div>
+    <div id="historyPagination" class="pagination-bar"></div>
   </section>
 
   <!-- FAQ -->
-  <section id="faq" class="content-section">
+  <section id="faq" class="content-section reveal">
     <h2 class="section-title">Pertanyaan Umum (FAQ)</h2>
-    <p class="section-sub">Jawaban cepat seputar penggunaan Laprakin.</p>
+    <p class="section-sub">Jawaban cepat seputar penggunaan LabCraft.</p>
     <div class="faq-list">
       <details class="faq-item" open>
         <summary>Apakah file .docx bisa langsung dikumpulkan ke portal?</summary>
@@ -458,26 +730,43 @@
       </details>
       <details class="faq-item">
         <summary>Bagaimana jika halaman tertutup sebelum selesai?</summary>
-        <p>Laprakin menyimpan draft secara otomatis di local storage perangkat Anda, sehingga isian Anda akan dipulihkan saat halaman dibuka kembali.</p>
+        <p>LabCraft menyimpan draft secara otomatis di local storage perangkat Anda, sehingga isian Anda akan dipulihkan saat halaman dibuka kembali.</p>
       </details>
       <details class="faq-item">
         <summary>Kenapa modul Struktur Data dan Statistika meminta Nama PJ Asisten?</summary>
-        <p>Sesuai aturan penamaan file kedua modul tersebut, nama PJ Asisten disematkan langsung di akhir nama file resmi.</p>
+        <p>Sesuai aturan penamaan file kedua modul tersebut, nama PJ Asisten serta jadwal slot disematkan langsung ke dalam nama file resmi.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Apakah saya harus mengisi Gemini API Key secara manual?</summary>
+        <p>Jika server sudah dikonfigurasi dengan <code>GEMINI_API_KEY</code>, kolom API Key boleh dikosongkan dan tombol Generate AI tetap bisa langsung digunakan.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Apakah screenshot bisa langsung di-paste tanpa disimpan dulu?</summary>
+        <p>Bisa. Cukup ambil screenshot (PrintScreen/Snipping Tool), lalu tekan <strong>Ctrl+V</strong> di halaman Step 2, Step 3, atau Step 4 untuk langsung menempelkannya.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Bagaimana cara mengganti username atau kata sandi akun?</summary>
+        <p>Klik tombol profil nama Anda di pojok kanan atas navbar (sebelah tombol Keluar) untuk membuka menu Pengaturan Profil.</p>
       </details>
     </div>
   </section>
 
   <!-- Pengembang -->
-  <section id="pengembang" class="content-section">
-    <div class="info-card" style="text-align: center; padding: 32px;">
-      <h2 style="margin: 0 0 8px;">Tim Pengembang Laprakin</h2>
-      <p style="max-width: 600px; margin: 0 auto 14px;">
+  <section id="pengembang" class="content-section reveal">
+    <div class="info-card" style="text-align: center; padding: 36px; align-items: center;">
+      <h2 style="margin: 0 0 8px; font-weight: 800;">Tim Pengembang LabCraft</h2>
+      <p style="max-width: 600px; margin: 0 auto 18px;">
         Dikembangkan untuk membantu mahasiswa Informatika dalam menyusun laporan praktikum secara cepat, rapi, dan konsisten di lingkungan Laboratorium Teknik Informatika (LabTIF) Universitas Ahmad Dahlan.
       </p>
+      <a href="https://github.com/AndiMardiansa" target="_blank" rel="noopener" class="btn btn-blue btn-sm" style="margin-bottom: 18px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>GitHub @AndiMardiansa</span>
+      </a>
       <div class="chips-row" style="justify-content: center; margin-bottom: 0;">
         <span class="chip">LabTIF UAD</span>
         <span class="chip">Python + Flask</span>
         <span class="chip">python-docx</span>
+        <span class="chip">Gemini AI</span>
         <span class="chip">SQLite</span>
       </div>
     </div>
@@ -487,11 +776,48 @@
     <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 8px;">
       <a href="{{ url_for('privacy') }}">Kebijakan privasi</a>
       <a href="{{ url_for('terms') }}">Ketentuan penggunaan</a>
-      <a href="{{ url_for('about_account') }}">Tentang Laprakin Account</a>
+      <a href="{{ url_for('about_account') }}">Tentang LabCraft Account</a>
       <a href="{{ url_for('admin_page') }}">Admin</a>
     </div>
     <div>©2026 LabTIF Universitas Ahmad Dahlan</div>
   </footer>
+
+  <!-- Profile & Account Modal -->
+  <div class="modal-backdrop" id="profileModal">
+    <div class="modal-box" style="text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="user-avatar" style="width: 34px; height: 34px; font-size: 14px;" id="profileModalAvatar">{{ (user.full_name or user.username)[0]|upper }}</span>
+          <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 800;">Pengaturan Profil</h3>
+            <div style="font-size: 12px; color: var(--text-muted);">Ubah nama, username, atau kata sandi</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" onclick="closeProfileModal()">Tutup</button>
+      </div>
+      <div id="profileError" class="alert alert-error" style="display: none;"></div>
+      <div id="profileSuccess" class="alert alert-success" style="display: none;"></div>
+      <div class="form-group">
+        <label class="form-label" for="profFullName">Nama Lengkap</label>
+        <input class="form-control" id="profFullName" type="text" value="{{ user.full_name }}" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="profUsername">Username <span class="req">*</span></label>
+        <input class="form-control" id="profUsername" type="text" value="{{ user.username }}" />
+      </div>
+      <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;" />
+      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 10px;">Ganti Kata Sandi (Opsional — kosongkan jika tidak ingin mengubah)</div>
+      <div class="form-group">
+        <label class="form-label" for="profCurrentPassword">Kata Sandi Saat Ini</label>
+        <input class="form-control" id="profCurrentPassword" type="password" placeholder="Wajib diisi jika mengganti kata sandi" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="profNewPassword">Kata Sandi Baru</label>
+        <input class="form-control" id="profNewPassword" type="password" placeholder="Minimal 6 karakter" />
+      </div>
+      <button type="button" class="btn btn-blue btn-block" id="saveProfileBtn" onclick="saveProfile()">Simpan Perubahan</button>
+    </div>
+  </div>
 
   <!-- Progress Modal -->
   <div class="modal-backdrop" id="progressModal">
@@ -511,7 +837,7 @@
         <span class="block-badge" id="tutBadge">Langkah 1 / 5</span>
         <button type="button" class="btn btn-outline btn-sm" onclick="closeTutorial()">Lewati</button>
       </div>
-      <h3 id="tutTitle" style="margin: 0 0 8px;">Pilih Modul & Profil</h3>
+      <h3 id="tutTitle" style="margin: 0 0 8px;">Pilih Modul &amp; Profil</h3>
       <p id="tutDesc" style="margin: 0 0 18px; font-size: 14px; color: var(--text-muted);"></p>
       <div style="display: flex; justify-content: space-between;">
         <button type="button" class="btn btn-outline btn-sm" id="tutPrevBtn" onclick="prevTutorial()">Sebelumnya</button>
@@ -521,10 +847,171 @@
   </div>
 
   <!-- Floating WhatsApp Help Button -->
-  <a class="wa-float" href="https://wa.me/6281200000000?text=Halo%20Admin%20LabTIF%2C%20saya%20butuh%20bantuan%20terkait%20Laprakin." target="_blank" rel="noopener">
+  <a class="wa-float" href="https://wa.me/6281200000000?text=Halo%20Admin%20LabTIF%2C%20saya%20butuh%20bantuan%20terkait%20LabCraft." target="_blank" rel="noopener">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
     <span>Bantuan WhatsApp</span>
   </a>
 
   <script src="{{ url_for('static', filename='js/wizard.js') }}"></script>
+  <script>
+    function openProfileModal() {
+      document.getElementById("profileError").style.display = "none";
+      document.getElementById("profileSuccess").style.display = "none";
+      document.getElementById("profCurrentPassword").value = "";
+      document.getElementById("profNewPassword").value = "";
+      document.getElementById("profileModal").classList.add("show");
+    }
+    function closeProfileModal() {
+      document.getElementById("profileModal").classList.remove("show");
+    }
+    async function saveProfile() {
+      const errEl = document.getElementById("profileError");
+      const okEl = document.getElementById("profileSuccess");
+      const btn = document.getElementById("saveProfileBtn");
+      errEl.style.display = "none";
+      okEl.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+      try {
+        const res = await fetch("/api/profile/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: document.getElementById("profFullName").value.trim(),
+            username: document.getElementById("profUsername").value.trim(),
+            currentPassword: document.getElementById("profCurrentPassword").value,
+            newPassword: document.getElementById("profNewPassword").value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || "Gagal memperbarui profil.";
+          errEl.style.display = "block";
+        } else {
+          okEl.textContent = data.message || "Profil berhasil diperbarui.";
+          okEl.style.display = "block";
+          document.getElementById("navUserName").textContent = data.fullName;
+          const initial = (data.fullName || data.username || "U")[0].toUpperCase();
+          document.querySelectorAll(".user-avatar").forEach((el) => (el.textContent = initial));
+          document.getElementById("profCurrentPassword").value = "";
+          document.getElementById("profNewPassword").value = "";
+          if (typeof showToast === "function") showToast("Profil berhasil diperbarui!", "success");
+        }
+      } catch (e) {
+        errEl.textContent = "Terjadi kesalahan jaringan.";
+        errEl.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Simpan Perubahan";
+      }
+    }
+
+    (function () {
+      const stage = document.querySelector(".coder-stage");
+      const visual = document.querySelector(".hero-visual");
+      const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (stage && visual && !reduced) {
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let baseRotX = 0;
+        let baseRotY = 0;
+
+        visual.addEventListener("mousemove", (e) => {
+          if (isDragging) return;
+          const rect = visual.getBoundingClientRect();
+          const nx = (e.clientX - rect.left) / rect.width - 0.5;
+          const ny = (e.clientY - rect.top) / rect.height - 0.5;
+          const rx = (-ny * 14).toFixed(2);
+          const ry = (nx * 18).toFixed(2);
+          stage.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+        });
+
+        visual.addEventListener("mouseleave", () => {
+          if (isDragging) return;
+          stage.style.transform = "rotateX(0deg) rotateY(0deg) translateZ(0px)";
+        });
+
+        stage.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          stage.classList.add("is-dragging");
+        });
+
+        window.addEventListener("mousemove", (e) => {
+          if (!isDragging) return;
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          const ry = Math.max(-28, Math.min(28, baseRotY + dx * 0.16)).toFixed(2);
+          const rx = Math.max(-20, Math.min(20, baseRotX - dy * 0.14)).toFixed(2);
+          stage.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px)`;
+        });
+
+        window.addEventListener("mouseup", () => {
+          if (!isDragging) return;
+          isDragging = false;
+          stage.classList.remove("is-dragging");
+          baseRotX = 0;
+          baseRotY = 0;
+          stage.style.transform = "rotateX(0deg) rotateY(0deg) translateZ(0px)";
+        });
+      }
+
+      const codeOut = document.getElementById("liveCodeOutput");
+      const docxBtn = document.getElementById("liveDocxBtn");
+      if (codeOut) {
+        const snippet = [
+          "# LabCraft Generator",
+          "from labcraft import Report",
+          "",
+          "doc = Report(",
+          '  modul="KDJK",',
+          '  margin="3-3-3-3cm",',
+          '  ai="Gemini Vision"',
+          ")",
+          'doc.export("laprak.docx")',
+          'print("Done! Ready PDF")'
+        ].join("\n");
+        let idx = 0;
+        let pauseTicks = 0;
+        setInterval(() => {
+          if (idx <= snippet.length) {
+            codeOut.textContent = snippet.slice(0, idx);
+            idx++;
+            if (idx > snippet.length && docxBtn) {
+              docxBtn.setAttribute("fill", "#059669");
+            }
+          } else {
+            pauseTicks++;
+            if (pauseTicks > 26) {
+              idx = 0;
+              pauseTicks = 0;
+              codeOut.textContent = "";
+              if (docxBtn) docxBtn.setAttribute("fill", "#2563EB");
+            }
+          }
+        }, 65);
+      }
+
+      const revealEls = document.querySelectorAll(".reveal");
+      if (!("IntersectionObserver" in window)) {
+        revealEls.forEach((el) => el.classList.add("is-visible"));
+        return;
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              io.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+      revealEls.forEach((el) => io.observe(el));
+    })();
+  </script>
 </body>
 </html>

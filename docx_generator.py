@@ -132,9 +132,9 @@ _TERM_PATTERN = re.compile(
 
 
 def sanitize_filename_part(value: str) -> str:
-    """Sanitize a string for safe inclusion in the official .docx filename."""
-    cleaned = re.sub(r"\s+", "_", value.strip())
-    cleaned = re.sub(r"[^A-Za-z0-9_\-]", "", cleaned)
+    """Sanitize a string for safe inclusion in the official .docx filename while preserving spaces."""
+    cleaned = re.sub(r'[\\/:*?"<>|]+', "", value.strip())
+    cleaned = re.sub(r"\s+", " ", cleaned)
     return cleaned or "TanpaNama"
 
 
@@ -144,22 +144,26 @@ def build_official_filename(
     student_name: str,
     meeting_number: int,
     pj_assistant: str = "",
+    day_name: str = "",
+    exec_time: str = "",
 ) -> str:
-    """Build the exact official filename according to Laprakin rules."""
+    """Build the exact official filename according to LabCraft / LabTIF rules."""
     nim_part = sanitize_filename_part(nim)
     name_part = sanitize_filename_part(student_name)
     meet_part = str(meeting_number).strip() or "1"
+    nim_3 = nim_part[-3:] if len(nim_part) >= 3 else nim_part
+    slot_raw = f"{day_name.strip()} {exec_time.strip()}".strip()
+    slot_part = sanitize_filename_part(slot_raw) if slot_raw else "Slot"
+    pj_part = sanitize_filename_part(pj_assistant) if pj_assistant.strip() else "PJ"
 
+    if module_key == "sdata":
+        return f"Pert{meet_part}_{nim_3}_{name_part}_SData_{slot_part}_{pj_part}.docx"
     if module_key == "kdjk":
         return f"{nim_part}_{name_part}_{meet_part}_KDJK.docx"
-    if module_key == "sdata":
-        pj_part = sanitize_filename_part(pj_assistant) if pj_assistant.strip() else "SLOT_PJ"
-        return f"{nim_part}_{name_part}_{meet_part}_SData_{pj_part}.docx"
     if module_key == "basdat":
-        return f"{nim_part}_{name_part}_{meet_part}_BasisData.docx"
+        return f"Pertemuan {meet_part}_{nim_part}_{name_part}.docx"
     if module_key == "statistika":
-        pj_part = sanitize_filename_part(pj_assistant) if pj_assistant.strip() else "SLOT_PJ"
-        return f"{nim_part}_{name_part}_{meet_part}_Statistika_{pj_part}.docx"
+        return f"{nim_part}_{name_part}_{slot_part}_{pj_part}_STATISTIKA({meet_part}).docx"
     return f"{nim_part}_{name_part}_{meet_part}_Laporan.docx"
 
 
@@ -548,7 +552,7 @@ def generate_report_docx(payload: Dict[str, Any], output_path: str) -> str:
                 q_text = (qa.get("question") or "").strip()
                 a_text = (qa.get("answer") or "").strip()
                 if q_text:
-                    add_formatted_paragraph(doc, f"Pertanyaan {idx}: {q_text}", bold=True, left_indent_cm=0.6)
+                    add_formatted_paragraph(doc, f"Pertanyaan {idx}: {q_text}", bold=False, left_indent_cm=0.6)
                 if a_text:
                     add_formatted_paragraph(doc, f"Jawaban: {a_text}", left_indent_cm=0.6)
         if pretest_images:

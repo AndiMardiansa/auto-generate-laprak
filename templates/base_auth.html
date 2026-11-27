@@ -3,16 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Laprakin — LabTIF UAD{% endblock %}</title>
+  <title>{% block title %}LabCraft — LabTIF UAD{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-brand">
-        <span class="brand-mark blue">L</span>
+        <span class="brand-mark blue" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
+        </span>
         <div>
-          <div style="font-weight: 800; font-size: 16px; line-height: 1.1;">Laprakin</div>
+          <div style="font-weight: 800; font-size: 16px; line-height: 1.1;">LabCraft</div>
           <div style="font-size: 11px; color: var(--text-muted);">LabTIF Universitas Ahmad Dahlan</div>
         </div>
       </div>
@@ -23,7 +28,7 @@
       <div class="auth-footer-links">
         <a href="{{ url_for('privacy') }}">Kebijakan privasi</a>
         <a href="{{ url_for('terms') }}">Ketentuan penggunaan</a>
-        <a href="{{ url_for('about_account') }}">Tentang Laprakin Account</a>
+        <a href="{{ url_for('about_account') }}">Tentang LabCraft Account</a>
       </div>
       <div>©2026 LabTIF Universitas Ahmad Dahlan</div>
     </footer>

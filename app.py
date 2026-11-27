@@ -253,6 +253,8 @@ def api_generate():
         student_name=student_name,
         meeting_number=meeting_number,
         pj_assistant=pj_assistant,
+        day_name=(data.get("dayName") or "").strip(),
+        exec_time=(data.get("execTime") or "").strip(),
     )
 
     unique_storage_name = f"{uuid.uuid4().hex}_{official_filename}"
@@ -310,7 +312,7 @@ def api_reports():
             FROM reports
             WHERE user_id = ?
             ORDER BY id DESC
-            LIMIT 30
+            LIMIT 100
             """,
             (session["user_id"],),
         ).fetchall()
@@ -321,6 +323,62 @@ def api_reports():
         item["downloadUrl"] = url_for("api_download_report", report_id=r["id"])
         items.append(item)
     return jsonify({"reports": items})
+
+
+@app.route("/api/profile/update", methods=["POST"])
+@login_required
+def api_profile_update():
+    data = request.get_json(silent=True) or {}
+    new_full_name = (data.get("fullName") or "").strip()
+    new_username = (data.get("username") or "").strip().lower()
+    current_password = data.get("currentPassword") or ""
+    new_password = data.get("newPassword") or ""
+
+    if not new_username or len(new_username) < 3:
+        return jsonify({"error": "Username minimal 3 karakter."}), 400
+    if not re.match(r"^[a-z0-9_.-]+$", new_username):
+        return jsonify({"error": "Username hanya boleh berisi huruf, angka, titik, garis bawah, atau strip."}), 400
+
+    uid = session["user_id"]
+    with get_db() as conn:
+        user = conn.execute("SELECT * FROM users WHERE id = ?", (uid,)).fetchone()
+        if not user:
+            return jsonify({"error": "Pengguna tidak ditemukan."}), 404
+
+        conflict = conn.execute(
+            "SELECT id FROM users WHERE lower(username) = ? AND id != ?",
+            (new_username, uid),
+        ).fetchone()
+        if conflict:
+            return jsonify({"error": "Username sudah digunakan akun lain."}), 409
+
+        final_full_name = new_full_name or user["full_name"]
+        final_hash = user["password_hash"]
+
+        if new_password:
+            if not current_password:
+                return jsonify({"error": "Masukkan kata sandi saat ini untuk mengganti kata sandi."}), 400
+            if not check_password_hash(user["password_hash"], current_password):
+                return jsonify({"error": "Kata sandi saat ini salah."}), 400
+            if len(new_password) < 6:
+                return jsonify({"error": "Kata sandi baru minimal 6 karakter."}), 400
+            final_hash = generate_password_hash(new_password)
+
+        conn.execute(
+            "UPDATE users SET full_name = ?, username = ?, password_hash = ? WHERE id = ?",
+            (final_full_name, new_username, final_hash, uid),
+        )
+
+    session["username"] = new_username
+    session["full_name"] = final_full_name
+    return jsonify(
+        {
+            "ok": True,
+            "username": new_username,
+            "fullName": final_full_name,
+            "message": "Profil berhasil diperbarui.",
+        }
+    )
 
 
 @app.route("/api/reports/<int:report_id>/download", methods=["GET"])

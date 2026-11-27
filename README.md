@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="static/img/logo-uad.png" alt="Logo UAD" width="90" />
+<!-- <img src="static/img/logo-uad.png" alt="Logo UAD" width="90" /> -->
 
 # Laprakin — Auto Generate Laprak LabTIF UAD
 
