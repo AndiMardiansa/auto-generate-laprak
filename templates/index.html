@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=13) }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=17) }}" />
 </head>
 <body>
   <div id="toastContainer" class="toast-container"></div>
@@ -30,23 +30,45 @@
         <a href="#pengembang">Pengembang</a>
       </div>
       <div class="nav-actions">
-        <button type="button" class="btn btn-outline btn-sm" onclick="fillExampleData()">
+        <button type="button" class="btn btn-outline btn-sm nav-desktop-only" onclick="fillExampleData()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v14"/><path d="m17 8-5-5-5 5"/><path d="M5 21h14"/></svg>
           <span>Isi Contoh</span>
         </button>
-        <button type="button" class="btn btn-outline btn-sm" onclick="openTutorial()" title="Panduan Singkat">
+        <button type="button" class="btn btn-outline btn-sm nav-desktop-only" onclick="openTutorial()" title="Panduan Singkat">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <span>Tutorial</span>
         </button>
         <button type="button" class="user-pill user-pill-btn" onclick="openProfileModal()" title="Pengaturan Profil & Akun">
           <span class="user-avatar" aria-hidden="true">{{ (user.full_name or user.username)[0]|upper }}</span>
-          <span id="navUserName">{{ user.full_name }}</span>
+          <span id="navUserName" class="nav-user-name">{{ user.full_name }}</span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
-        <a href="{{ url_for('logout') }}" class="btn btn-logout btn-sm">
+        <a href="{{ url_for('logout') }}" class="btn btn-logout btn-sm nav-tablet-up">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span>Keluar</span>
         </a>
+        <button type="button" class="nav-toggle-btn" id="navToggleBtn" onclick="toggleMobileNav()" aria-label="Buka menu navigasi" aria-expanded="false">
+          <svg class="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <svg class="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Responsive Mobile & iPad Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+      <div class="mobile-nav-links">
+        <a href="#wizard" onclick="closeMobileNav()">Wizard Penyusunan</a>
+        <a href="#katalog" onclick="closeMobileNav()">Katalog Modul</a>
+        <a href="#standar" onclick="closeMobileNav()">Standar Format</a>
+        <a href="#riwayat" onclick="closeMobileNav()">Riwayat Laporan</a>
+        <a href="#faq" onclick="closeMobileNav()">FAQ</a>
+        <a href="#pengembang" onclick="closeMobileNav()">Tim Pengembang</a>
+      </div>
+      <div class="mobile-nav-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="fillExampleData(); closeMobileNav();">Isi Contoh</button>
+        <button type="button" class="btn btn-outline btn-sm" onclick="openTutorial(); closeMobileNav();">Tutorial</button>
+        <button type="button" class="btn btn-blue btn-sm" onclick="openProfileModal(); closeMobileNav();">Profil Akun</button>
+        <a href="{{ url_for('logout') }}" class="btn btn-logout btn-sm">Keluar</a>
       </div>
     </div>
   </nav>
@@ -914,6 +936,24 @@
       }
     }
 
+    function toggleMobileNav() {
+      const drawer = document.getElementById("mobileNavDrawer");
+      const btn = document.getElementById("navToggleBtn");
+      if (!drawer || !btn) return;
+      const isOpen = drawer.classList.toggle("open");
+      btn.classList.toggle("is-open", isOpen);
+      btn.setAttribute("aria-expanded", String(isOpen));
+    }
+    function closeMobileNav() {
+      const drawer = document.getElementById("mobileNavDrawer");
+      const btn = document.getElementById("navToggleBtn");
+      if (drawer) drawer.classList.remove("open");
+      if (btn) {
+        btn.classList.remove("is-open");
+        btn.setAttribute("aria-expanded", "false");
+      }
+    }
+
     (function () {
       const stage = document.querySelector(".coder-stage");
       const visual = document.querySelector(".hero-visual");
@@ -1000,6 +1040,22 @@
             }
           }
         }, 65);
+      }
+
+      const devWrap = document.querySelector(".dev-photo-wrap");
+      const devImg = document.querySelector(".dev-photo");
+      if (devWrap && devImg && !reduced) {
+        devWrap.addEventListener("mousemove", (e) => {
+          const rect = devWrap.getBoundingClientRect();
+          const px = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100)).toFixed(1);
+          const py = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100)).toFixed(1);
+          devImg.style.transformOrigin = `${px}% ${py}%`;
+          devImg.style.transform = "scale(1.42)";
+        });
+        devWrap.addEventListener("mouseleave", () => {
+          devImg.style.transformOrigin = "center center";
+          devImg.style.transform = "scale(1)";
+        });
       }
 
       const revealEls = document.querySelectorAll(".reveal");

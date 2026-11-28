@@ -28,13 +28,13 @@
   <div class="content-section" style="margin-top: 40px;">
     <div id="pinGate" class="auth-card" style="margin: 40px auto; display: {{ 'none' if unlocked else 'block' }};">
       <h2 class="auth-title">Akses Admin Terkunci</h2>
-      <p class="auth-subtitle">Masukkan PIN 4 digit untuk melihat statistik pengguna dan laporan.</p>
+      <p class="auth-subtitle">Masukkan kata sandi admin untuk melihat statistik pengguna dan laporan.</p>
       <div id="pinError" class="alert alert-error" style="display: none;"></div>
       <div class="form-group">
-        <label class="form-label" for="pinInput">PIN 4 Digit</label>
-        <input class="form-control" id="pinInput" type="password" maxlength="4" inputmode="numeric" placeholder="••••" style="letter-spacing: 8px; text-align: center; font-size: 20px;" />
+        <label class="form-label" for="adminPasswordInput">Kata Sandi Admin</label>
+        <input class="form-control" id="adminPasswordInput" type="password" placeholder="Masukkan kata sandi admin" onkeydown="if(event.key==='Enter') unlockAdmin()" />
       </div>
-      <button class="btn btn-black btn-block" onclick="unlockAdmin()">Buka Panel Admin</button>
+      <button class="btn btn-blue btn-block" onclick="unlockAdmin()">Buka Panel Admin</button>
     </div>
 
     <div id="adminDashboard" style="display: {{ 'block' if unlocked else 'none' }};">
@@ -80,17 +80,17 @@
 
   <script>
     async function unlockAdmin() {
-      const pin = document.getElementById("pinInput").value.trim();
+      const password = document.getElementById("adminPasswordInput").value;
       const errEl = document.getElementById("pinError");
       errEl.style.display = "none";
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ password }),
       });
       if (!res.ok) {
         const data = await res.json();
-        errEl.textContent = data.error || "PIN salah.";
+        errEl.textContent = data.error || "Kata sandi admin salah.";
         errEl.style.display = "block";
         return;
       }

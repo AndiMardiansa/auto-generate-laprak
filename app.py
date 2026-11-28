@@ -1,5 +1,7 @@
+import hmac
 import os
 import re
+import time
 import uuid
 from functools import wraps
 
@@ -25,7 +27,12 @@ from gemini_service import generate_report_ai_content
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 GENERATED_DIR = os.path.join(BASE_DIR, "generated")
-ADMIN_PIN = os.environ.get("LAPRAKIN_ADMIN_PIN", "2026")
+ADMIN_PASSWORD = (
+    os.environ.get("LABCRAFT_ADMIN_PASSWORD")
+    or os.environ.get("LAPRAKIN_ADMIN_PASSWORD")
+    or "labtif-uad-admin-2026"
+)
+_ADMIN_FAILS: dict[str, list[float]] = {}
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("LAPRAKIN_SECRET_KEY", "laprakin-labtif-uad-2026-secret")
@@ -412,12 +419,23 @@ def admin_page():
 
 @app.route("/api/admin/auth", methods=["POST"])
 def api_admin_auth():
+    client_ip = request.remote_addr or "unknown"
+    now = time.time()
+    recent_fails = [t for t in _ADMIN_FAILS.get(client_ip, []) if now - t < 60.0]
+    _ADMIN_FAILS[client_ip] = recent_fails
+    if len(recent_fails) >= 5:
+        return jsonify({"error": "Terlalu banyak percobaan gagal. Coba lagi dalam 1 menit."}), 429
+
     data = request.get_json(silent=True) or {}
-    pin = str(data.get("pin") or "").strip()
-    if pin == ADMIN_PIN:
+    password = str(data.get("password") or "")
+    if password and hmac.compare_digest(password, ADMIN_PASSWORD):
+        _ADMIN_FAILS.pop(client_ip, None)
         session["admin_unlocked"] = True
         return jsonify({"ok": True})
-    return jsonify({"error": "PIN 4 digit salah."}), 401
+
+    recent_fails.append(now)
+    _ADMIN_FAILS[client_ip] = recent_fails
+    return jsonify({"error": "Kata sandi admin salah."}), 401
 
 
 @app.route("/api/admin/logout", methods=["POST"])
