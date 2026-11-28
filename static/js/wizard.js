@@ -99,7 +99,7 @@ let state = createDefaultState();
 function createDefaultState() {
   return {
     moduleKey: "kdjk",
-    nim: "",
+    nim: document.getElementById("nim")?.value || "",
     studentName: document.getElementById("studentName")?.value || "",
     meetingNumber: 1,
     className: "",
@@ -153,6 +153,12 @@ function loadDraft() {
     if (!raw) return;
     const parsed = JSON.parse(raw);
     state = { ...createDefaultState(), ...parsed };
+    if (!state.nim) {
+      state.nim = document.getElementById("nim")?.value || "";
+    }
+    if (!state.studentName) {
+      state.studentName = document.getElementById("studentName")?.value || "";
+    }
   } catch (e) {
     state = createDefaultState();
   }
@@ -636,13 +642,52 @@ function formatTechnicalHtml(str) {
   return escapeHtml(str).replace(TECH_TERMS_REGEX, (m) => `<em>${m}</em>`);
 }
 
-async function generateWithGeminiAI() {
-  const btn = document.getElementById("aiGenerateBtn");
-  const apiKey = (document.getElementById("geminiApiKey")?.value || "").trim() || localStorage.getItem("laprakin_gemini_key") || "";
+const _AI_SPARKLE_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>';
+const _AI_SPINNER_SVG = '<svg class="ai-btn-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
+
+function startAiLoading(cardId, btnId, loadingId, idleLabel, steps) {
+  const card = document.getElementById(cardId);
+  const btn = document.getElementById(btnId);
+  const box = document.getElementById(loadingId);
+  const textEl = box ? box.querySelector(".ai-status-text") : null;
+  if (card) card.classList.add("is-loading");
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Menghasilkan dengan AI...";
+    btn.innerHTML = `${_AI_SPINNER_SVG}<span>Memproses AI...</span>`;
   }
+  if (box) box.classList.add("active");
+  let stepIdx = 0;
+  if (textEl && steps.length) textEl.textContent = steps[0];
+  const timer = setInterval(() => {
+    stepIdx = (stepIdx + 1) % steps.length;
+    if (textEl) textEl.textContent = steps[stepIdx];
+  }, 1800);
+
+  return () => {
+    clearInterval(timer);
+    if (card) card.classList.remove("is-loading");
+    if (box) box.classList.remove("active");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `${_AI_SPARKLE_SVG}<span>${idleLabel}</span>`;
+    }
+  };
+}
+
+async function generateWithGeminiAI() {
+  const apiKey = (document.getElementById("geminiApiKey")?.value || "").trim() || localStorage.getItem("laprakin_gemini_key") || "";
+  const stopLoading = startAiLoading(
+    "aiCardResult",
+    "aiGenerateBtn",
+    "aiLoadingResult",
+    "Generate dengan AI (Gemini)",
+    [
+      "Menganalisis screenshot dengan Gemini Vision...",
+      "Menyusun Alat & Bahan dan Langkah Kerja...",
+      "Merangkai Keterangan Gambar & Analisis Hasil...",
+      "Menyempurnakan Ulasan Praktikum...",
+    ]
+  );
   try {
     const res = await fetch("/api/ai/generate", {
       method: "POST",
@@ -698,20 +743,23 @@ async function generateWithGeminiAI() {
   } catch (err) {
     showToast(err.message, "error");
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Generate dengan AI (Gemini)";
-    }
+    stopLoading();
   }
 }
 
 async function generatePosttestWithGeminiAI() {
-  const btn = document.getElementById("aiPosttestBtn");
   const apiKey = (document.getElementById("geminiApiKey")?.value || "").trim() || localStorage.getItem("laprakin_gemini_key") || "";
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = "Menghasilkan Post-Test...";
-  }
+  const stopLoading = startAiLoading(
+    "aiCardPosttest",
+    "aiPosttestBtn",
+    "aiLoadingPosttest",
+    "Generate Post-Test dengan AI (Gemini)",
+    [
+      "Memindai gambar & kode Post-Test...",
+      "Menyusun Keterangan Gambar Post-Test...",
+      "Merangkai Analisis Hasil Post-Test...",
+    ]
+  );
   try {
     const res = await fetch("/api/ai/generate", {
       method: "POST",
@@ -748,10 +796,7 @@ async function generatePosttestWithGeminiAI() {
   } catch (err) {
     showToast(err.message, "error");
   } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = "Generate Post-Test dengan AI (Gemini)";
-    }
+    stopLoading();
   }
 }
 

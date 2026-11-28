@@ -60,7 +60,7 @@ def current_user():
         return None
     with get_db() as conn:
         row = conn.execute(
-            "SELECT id, full_name, username, created_at FROM users WHERE id = ?",
+            "SELECT id, full_name, username, nim, created_at FROM users WHERE id = ?",
             (uid,),
         ).fetchone()
     return dict(row) if row else None
@@ -338,6 +338,7 @@ def api_profile_update():
     data = request.get_json(silent=True) or {}
     new_full_name = (data.get("fullName") or "").strip()
     new_username = (data.get("username") or "").strip().lower()
+    new_nim = (data.get("nim") or "").strip()
     current_password = data.get("currentPassword") or ""
     new_password = data.get("newPassword") or ""
 
@@ -372,8 +373,8 @@ def api_profile_update():
             final_hash = generate_password_hash(new_password)
 
         conn.execute(
-            "UPDATE users SET full_name = ?, username = ?, password_hash = ? WHERE id = ?",
-            (final_full_name, new_username, final_hash, uid),
+            "UPDATE users SET full_name = ?, username = ?, nim = ?, password_hash = ? WHERE id = ?",
+            (final_full_name, new_username, new_nim, final_hash, uid),
         )
 
     session["username"] = new_username
@@ -383,6 +384,7 @@ def api_profile_update():
             "ok": True,
             "username": new_username,
             "fullName": final_full_name,
+            "nim": new_nim,
             "message": "Profil berhasil diperbarui.",
         }
     )

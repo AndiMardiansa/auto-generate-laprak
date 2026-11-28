@@ -26,11 +26,15 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 full_name TEXT NOT NULL,
                 username TEXT NOT NULL UNIQUE,
+                nim TEXT NOT NULL DEFAULT '',
                 password_hash TEXT NOT NULL,
                 created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
             )
             """
         )
+        cols = [r["name"] for r in conn.execute("PRAGMA table_info(users)").fetchall()]
+        if "nim" not in cols:
+            conn.execute("ALTER TABLE users ADD COLUMN nim TEXT NOT NULL DEFAULT ''")
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS reports (

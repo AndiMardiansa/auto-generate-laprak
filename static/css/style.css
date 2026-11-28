@@ -2582,3 +2582,82 @@ tbody tr:hover {
     font-size: 12px;
   }
 }
+
+
+/* ==========================================================================
+   AI Generate Loading Animation (Step 3 & Step 4)
+   ========================================================================== */
+.ai-assistant-card.is-loading {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14), 0 10px 24px rgba(37, 99, 235, 0.12);
+}
+
+.ai-assistant-card.is-loading .ai-sparkle-badge {
+  animation: aiSparkleSpin 1.8s ease-in-out infinite;
+}
+
+@keyframes aiSparkleSpin {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.14) rotate(180deg); }
+}
+
+.ai-btn-spin {
+  animation: spin 0.75s linear infinite;
+}
+
+.ai-loading-status {
+  display: none;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-primary-border);
+}
+
+.ai-loading-status.active {
+  display: block;
+  animation: stepFade 0.2s ease-out;
+}
+
+.ai-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-primary-hover);
+  margin-bottom: 8px;
+}
+
+.ai-pulse-orb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+  animation: pulseDot 1.2s infinite;
+  flex-shrink: 0;
+}
+
+.ai-progress-track {
+  height: 5px;
+  width: 100%;
+  background: #dbeafe;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.ai-progress-beam {
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 45%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--color-primary), var(--color-accent), transparent);
+  animation: aiLaserSweep 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes aiLaserSweep {
+  0% { left: -45%; }
+  100% { left: 105%; }
+}

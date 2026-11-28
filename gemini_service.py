@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import socket
 import time
 import urllib.error
 import urllib.request
@@ -236,9 +237,17 @@ Format JSON persis:
                 method="POST",
             )
             try:
-                with urllib.request.urlopen(req, timeout=60) as resp:
+                with urllib.request.urlopen(req, timeout=120) as resp:
                     resp_data = json.loads(resp.read().decode("utf-8"))
                     break
+            except (TimeoutError, socket.timeout):
+                last_err = RuntimeError(
+                    "Permintaan ke Gemini API melewati batas waktu (timeout). Silakan coba lagi atau kurangi jumlah/ukuran gambar."
+                )
+                if attempt == 0:
+                    time.sleep(1)
+                    continue
+                break
             except urllib.error.HTTPError as err:
                 detail = err.read().decode("utf-8", errors="ignore")
                 if err.code in (503, 429):
@@ -291,7 +300,7 @@ Format JSON persis:
                 method="POST",
             )
             try:
-                with urllib.request.urlopen(req, timeout=60) as resp:
+                with urllib.request.urlopen(req, timeout=120) as resp:
                     resp_data = json.loads(resp.read().decode("utf-8"))
                     break
             except Exception:
